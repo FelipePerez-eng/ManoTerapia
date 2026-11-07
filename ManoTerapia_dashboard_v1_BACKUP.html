@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ManoTerapia | Plataforma de control</title>
+<style>
+:root{--bg:#f3f6fb;--surface:#fff;--surface2:#f8faff;--text:#172238;--muted:#68758b;--border:#dce4ef;--blue:#2864dc;--blue2:#eaf1ff;--green:#15966b;--green2:#e8f7f1;--amber:#bd7b13;--amber2:#fff4df;--red:#cc4848;--red2:#fff0f0;--shadow:0 10px 30px rgba(25,45,80,.06)}
+@media(prefers-color-scheme:dark){:root{--bg:#101722;--surface:#182232;--surface2:#202d40;--text:#eaf0fa;--muted:#a7b3c6;--border:#304057;--blue:#79a4ff;--blue2:#223454;--green:#50c99d;--green2:#173b34;--amber:#e5b45b;--amber2:#41331c;--red:#ff8585;--red2:#452526;--shadow:0 10px 30px rgba(0,0,0,.18)}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;font-size:14px}button,input{font:inherit}button{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:10px;padding:10px 14px;cursor:pointer;transition:.15s}button:hover:not(:disabled){border-color:var(--blue);transform:translateY(-1px)}button:disabled{opacity:.45;cursor:not-allowed}button.primary{background:var(--blue);border-color:var(--blue);color:#fff}button.success{background:var(--green);border-color:var(--green);color:#fff}button.danger{background:var(--red2);border-color:rgba(204,72,72,.25);color:var(--red)}button.ghost{background:transparent}.app{max-width:1440px;margin:auto;padding:22px}.top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:20px}.brand{display:flex;align-items:center;gap:12px}.logo{height:44px;width:44px;border-radius:14px;background:var(--blue);color:white;display:grid;place-items:center;font-size:23px;font-weight:800}.brand h1{font-size:20px;letter-spacing:-.4px;margin:0}.brand p{margin:2px 0 0;color:var(--muted);font-size:12px}.top-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.pill{border:1px solid var(--border);padding:7px 11px;border-radius:999px;background:var(--surface);font-size:12px;color:var(--muted);white-space:nowrap}.pill.ok{color:var(--green);border-color:color-mix(in srgb,var(--green) 35%,var(--border));background:var(--green2)}.pill.warn{color:var(--amber);background:var(--amber2)}.nav{display:flex;gap:7px;overflow:auto;padding:5px;background:var(--surface);border:1px solid var(--border);border-radius:13px;margin-bottom:20px}.nav button{border:0;background:transparent;white-space:nowrap;color:var(--muted);font-weight:600}.nav button.active{background:var(--blue2);color:var(--blue)}.view{display:none}.view.active{display:block}.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin:3px 0 16px}.page-head h2{margin:0;font-size:23px;letter-spacing:-.5px}.page-head p{color:var(--muted);margin:5px 0 0}.grid{display:grid;gap:14px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:17px;box-shadow:var(--shadow);min-width:0}.card h3{font-size:15px;margin:0 0 5px}.muted{color:var(--muted)}.small{font-size:12px;color:var(--muted);line-height:1.5}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:700}.hero{background:linear-gradient(120deg,var(--surface),var(--blue2));border:1px solid var(--border);border-radius:18px;padding:24px;margin-bottom:15px;display:flex;align-items:center;justify-content:space-between;gap:22px}.hero h2{font-size:25px;margin:5px 0 7px;letter-spacing:-.7px}.hero p{max-width:650px;color:var(--muted);margin:0;line-height:1.55}.hero-mark{font-size:66px;opacity:.85}.mode-card{display:flex;flex-direction:column;gap:12px;min-height:190px}.mode-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:var(--blue2);font-size:21px}.mode-card h3{font-size:16px}.mode-card p{color:var(--muted);line-height:1.5;margin:0;flex:1}.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}.stat{padding:14px;border:1px solid var(--border);border-radius:13px;background:var(--surface)}.stat .value{font-size:25px;font-weight:750;letter-spacing:-.6px}.stat .label{color:var(--muted);font-size:12px;margin-top:3px}.fingers{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.finger{background:var(--surface2);border:1px solid var(--border);border-radius:13px;padding:13px 9px;text-align:center;min-width:0}.finger .fname{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.04em}.gauge{height:125px;width:35px;margin:10px auto 8px;border-radius:20px;border:1px solid var(--border);background:var(--bg);overflow:hidden;position:relative}.gauge-fill{position:absolute;left:0;right:0;bottom:0;height:0;border-radius:18px;transition:height .14s;background:var(--blue)}.finger .value{font-size:22px;font-weight:750}.finger .state{font-size:11px;font-weight:700;margin-top:3px}.finger .meta{font-size:10px;color:var(--muted);margin-top:5px;overflow-wrap:anywhere}.section-title{font-size:15px;margin:0 0 12px}.status-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.dot{height:8px;width:8px;border-radius:50%;background:var(--muted);display:inline-block}.dot.green{background:var(--green)}.dot.red{background:var(--red)}.mode-strip{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.target-list{display:grid;gap:9px}.target-row{display:grid;grid-template-columns:95px 1fr 45px;gap:10px;align-items:center;font-size:12px}.track{height:9px;border-radius:99px;background:var(--surface2);border:1px solid var(--border);overflow:hidden}.track>span{display:block;height:100%;background:var(--blue);border-radius:99px}.target-row .num{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}.exercise-panel{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);gap:14px}.exercise-current{display:flex;align-items:center;gap:15px;background:var(--blue2);border-radius:13px;padding:15px;margin:13px 0}.exercise-symbol{height:56px;width:56px;border-radius:15px;background:var(--surface);display:grid;place-items:center;font-size:29px}.exercise-current h3{font-size:17px;margin:0 0 3px}.exercise-current p{margin:0;color:var(--muted);font-size:12px}.progress{height:8px;background:var(--surface2);border-radius:99px;overflow:hidden}.progress span{display:block;height:100%;width:0;background:var(--green);transition:width .2s}.routine-step-list{display:grid;gap:7px}.step-item{display:flex;gap:10px;align-items:center;padding:9px 10px;border:1px solid var(--border);border-radius:10px;background:var(--surface2)}.step-no{height:25px;width:25px;border-radius:50%;display:grid;place-items:center;background:var(--surface);color:var(--muted);font-size:11px;font-weight:700}.step-item.done{border-color:color-mix(in srgb,var(--green) 45%,var(--border));background:var(--green2)}.step-item.current{border-color:var(--blue);background:var(--blue2)}.step-item .step-name{font-weight:650;font-size:12px}.step-item .step-state{margin-left:auto;color:var(--muted);font-size:11px}.gesture-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.gesture-card{display:flex;flex-direction:column;gap:10px}.gesture-art{height:105px;border-radius:13px;background:linear-gradient(140deg,var(--blue2),var(--surface2));display:grid;place-items:center;font-size:48px}.gesture-card h3{margin:0;font-size:15px}.gesture-card p{margin:0;color:var(--muted);font-size:12px;line-height:1.5;min-height:36px}.gesture-card .actions button{flex:1}.notice{border:1px solid color-mix(in srgb,var(--amber) 40%,var(--border));background:var(--amber2);color:var(--text);padding:12px 14px;border-radius:12px;font-size:12px;line-height:1.5}.success-box{border:1px solid color-mix(in srgb,var(--green) 40%,var(--border));background:var(--green2);padding:12px;border-radius:12px}.field{display:grid;gap:6px}.field label{font-size:12px;font-weight:650}.field input{width:100%;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:9px;padding:10px}.metric-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.metric-tile{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:13px}.metric-tile .v{font-size:22px;font-weight:750}.metric-tile .l{font-size:11px;color:var(--muted);margin-top:3px}.history-list{display:grid;gap:8px}.history-item{border:1px solid var(--border);border-radius:11px;padding:12px;display:flex;justify-content:space-between;gap:10px;align-items:center}.table-like{width:100%;border-collapse:collapse;font-size:12px}.table-like th,.table-like td{padding:9px 7px;border-bottom:1px solid var(--border);text-align:left}.table-like th{color:var(--muted);font-weight:650}.empty{color:var(--muted);padding:18px;text-align:center;background:var(--surface2);border-radius:11px}.hidden{display:none!important}.footer-note{margin:18px 2px 0;color:var(--muted);font-size:11px;line-height:1.5}.toast{position:fixed;right:20px;bottom:20px;z-index:10;background:var(--text);color:var(--surface);padding:12px 16px;border-radius:11px;box-shadow:var(--shadow);max-width:min(420px,calc(100vw - 40px));opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s}.toast.show{opacity:1;transform:translateY(0)}
+@media(max-width:900px){.grid.three,.gesture-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.exercise-panel{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.app{padding:12px}.top{align-items:flex-start;flex-direction:column}.top-actions{width:100%}.hero{padding:18px}.hero-mark{display:none}.grid.two,.grid.three,.gesture-grid{grid-template-columns:1fr}.fingers{gap:5px}.finger{padding:10px 3px}.gauge{height:94px;width:27px}.finger .value{font-size:17px}.finger .fname{font-size:9px}.finger .meta{font-size:9px}.stats{gap:7px}.stat .value{font-size:21px}.target-row{grid-template-columns:75px 1fr 38px}.page-head{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><div class="logo">M</div><div><h1>ManoTerapia</h1><p>Plataforma de control y seguimiento robótico</p></div></div>
+    <div class="top-actions">
+      <span class="pill" id="connectionPill">● Desconectado</span>
+      <span class="pill" id="servoPill">Servos: apagados</span>
+      <button class="primary" id="btnConnect">Conectar ESP32</button>
+      <button id="btnDisconnect" disabled>Desconectar</button>
+    </div>
+  </header>
+
+  <nav class="nav" aria-label="Navegación principal">
+    <button class="active" data-view="home">⌂ Inicio</button>
+    <button data-view="control">✋ Control espejo</button>
+    <button data-view="routines">☷ Rutinas</button>
+    <button data-view="gestures">✌ Gestos</button>
+    <button data-view="tracking">▥ Seguimiento</button>
+  </nav>
+
+  <main>
+    <section class="view active" id="view-home">
+      <div class="hero">
+        <div><div class="eyebrow">Sistema maestro–esclavo</div><h2>Movimiento, control y seguimiento</h2><p>Controla la mano robótica, realiza actividades guiadas y consulta los resultados de cada sesión desde una única interfaz.</p><div class="actions" style="margin-top:15px"><button class="primary" data-go="control">Abrir control espejo</button><button data-go="routines">Ver rutinas</button></div></div>
+        <div class="hero-mark">✋</div>
+      </div>
+      <div class="grid three">
+        <article class="card mode-card"><div class="mode-icon">↔</div><div><h3>Control espejo</h3><p>La mano maestra controla en tiempo real los cinco servomotores de la mano esclava.</p></div><button data-go="control">Entrar al control</button></article>
+        <article class="card mode-card"><div class="mode-icon">☷</div><div><h3>Rutinas guiadas</h3><p>Completa cada ejercicio antes de desbloquear el siguiente movimiento de la secuencia.</p></div><button data-go="routines">Abrir rutinas</button></article>
+        <article class="card mode-card"><div class="mode-icon">✌</div><div><h3>Biblioteca de gestos</h3><p>Demuestra gestos con la mano esclava o practica reproduciéndolos con la mano maestra.</p></div><button data-go="gestures">Abrir gestos</button></article>
+      </div>
+      <div class="card" style="margin-top:14px"><div class="status-line"><span class="dot" id="homeDot"></span><strong id="homeStatus">Esperando conexión con el ESP32</strong><span class="pill" id="modePill">Modo: MANUAL</span></div><p class="small" style="margin-bottom:0">El control manual utiliza los cinco potenciómetros existentes. La posición física de la mano esclava no se mide en esta versión.</p></div>
+    </section>
+
+    <section class="view" id="view-control">
+      <div class="page-head"><div><h2>Control espejo</h2><p>Lectura en vivo de la mano maestra y control de los cinco servomotores.</p></div><div class="mode-strip"><span class="pill" id="controlMode">Modo: MANUAL</span><button class="danger" id="btnStop">Detener actividad</button></div></div>
+      <div class="stats">
+        <div class="stat"><div class="value" id="handState">--</div><div class="label">Estado estimado de la maestra</div></div>
+        <div class="stat"><div class="value" id="repCount">0</div><div class="label">Ciclos abierta → cerrada</div></div>
+        <div class="stat"><div class="value" id="sessionTime">00:00</div><div class="label">Tiempo de sesión</div></div>
+        <div class="stat"><div class="value" id="meanFlex">--</div><div class="label">Flexión media estimada</div></div>
+      </div>
+      <div class="card"><h3 class="section-title">Sensores de la mano maestra</h3><div class="fingers" id="fingerGrid"></div></div>
+      <div class="card"><h3 class="section-title">Controles del sistema</h3><div class="actions"><button class="success" id="btnServo">Activar servos</button><button id="btnCalReset">Reiniciar min/max</button><button class="primary" id="btnManualMode">Activar control espejo</button></div><p class="small" style="margin-bottom:0">La orden de activación mueve los servos inicialmente a la posición abierta configurada y después el modo manual sigue los sensores. Comprueba el recorrido mecánico sin colocar la mano de una persona en el mecanismo.</p></div>
+    </section>
+
+    <section class="view" id="view-routines">
+      <div class="page-head"><div><h2>Rutinas guiadas</h2><p>El siguiente ejercicio se habilita cuando los cinco sensores maestros cumplen el objetivo actual.</p></div><span class="pill" id="routineState">Rutina sin iniciar</span></div>
+      <div class="exercise-panel">
+        <div class="card">
+          <div class="eyebrow">Secuencia demostrativa</div>
+          <div class="exercise-current"><div class="exercise-symbol" id="routineSymbol">✋</div><div><h3 id="routineTitle">Movilidad básica de la mano</h3><p id="routineDescription">Inicia la secuencia para comenzar.</p></div></div>
+          <div class="status-line" style="justify-content:space-between;margin-bottom:7px"><strong id="routineStepLabel">Ejercicio 0 de 6</strong><span class="small" id="routineProgressText">0% completado</span></div>
+          <div class="progress"><span id="routineProgress"></span></div>
+          <div style="margin-top:15px"><div class="status-line" style="justify-content:space-between;margin-bottom:7px"><strong>Objetivo por dedo</strong><span class="small">Tolerancia inicial: ±15 puntos</span></div><div class="target-list" id="routineTargets"></div></div>
+          <div class="success-box hidden" id="routineSuccess" style="margin-top:14px"><strong>¡Objetivo alcanzado!</strong><div class="small">Los cinco sensores se mantuvieron dentro de la tolerancia. Ya puedes pasar al siguiente ejercicio.</div></div>
+          <div class="notice" id="routineFeedback" style="margin-top:14px">Conecta el ESP32 e inicia una rutina. Mantén la posición solicitada para completar cada ejercicio.</div>
+          <div class="actions" style="margin-top:15px"><button class="primary" id="btnRoutineStart">Iniciar rutina</button><button id="btnRoutineNext" disabled>Siguiente ejercicio</button><button class="danger" id="btnRoutineCancel" disabled>Finalizar rutina</button></div>
+        </div>
+        <div class="card"><h3 class="section-title">Pasos de la rutina</h3><div class="routine-step-list" id="routineSteps"></div><p class="small" style="margin-bottom:0;margin-top:12px">La secuencia es una demostración de funcionamiento del prototipo, no un protocolo clínico ni una prescripción terapéutica.</p></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-gestures">
+      <div class="page-head"><div><h2>Biblioteca de gestos</h2><p>Selecciona una demostración automática o practica el gesto con la mano maestra.</p></div><span class="pill" id="gestureStatus">Sin gesto seleccionado</span></div>
+      <div class="notice" style="margin-bottom:14px">En las demostraciones automáticas, el sistema confirma que terminó de enviar las órdenes a los servos. No verifica la posición física alcanzada por la mano esclava.</div>
+      <div class="gesture-grid" id="gestureGrid"></div>
+      <div class="card" style="margin-top:14px"><div class="status-line" style="justify-content:space-between"><div><h3 id="selectedGestureTitle" style="margin:0">Selecciona un gesto</h3><p class="small" id="selectedGestureDesc" style="margin:4px 0 0">Aquí se mostrarán los objetivos del gesto seleccionado.</p></div><span class="pill" id="gestureResult">Sin evaluar</span></div><div class="target-list" id="gestureTargets" style="margin-top:14px"></div><div class="actions" style="margin-top:14px"><button class="success" id="btnGestureDemo" disabled>Demostración automática</button><button class="primary" id="btnGesturePractice" disabled>Practicar gesto</button></div><div class="success-box hidden" id="practiceSuccess" style="margin-top:12px"><strong>Gesto completado según los sensores maestros.</strong><div class="small">La mano maestra alcanzó el objetivo configurado y mantuvo la posición.</div></div></div>
+    </section>
+
+    <section class="view" id="view-tracking">
+      <div class="page-head"><div><h2>Seguimiento de sesiones</h2><p>Registro de datos de señal y actividades realizadas durante las pruebas.</p></div><span class="pill" id="trackingState">Sin sesión activa</span></div>
+      <div class="grid two">
+        <div class="card"><h3 class="section-title">Sesión actual</h3><div class="field"><label for="sessionCode">Código de prueba o sesión</label><input id="sessionCode" placeholder="Ej. PRUEBA-001" maxlength="40"></div><div class="actions" style="margin-top:12px"><button class="primary" id="btnStartSession">Iniciar nueva sesión</button><button class="success" id="btnSaveSession">Finalizar y guardar</button><button class="danger" id="btnDiscardSession">Descartar</button></div><p class="small">Los registros se guardan localmente en el navegador. Utiliza códigos de prueba, no datos personales de participantes.</p></div>
+        <div class="card"><h3 class="section-title">Resumen de la sesión</h3><div class="metric-grid"><div class="metric-tile"><div class="v" id="trackDuration">00:00</div><div class="l">Duración</div></div><div class="metric-tile"><div class="v" id="trackReps">0</div><div class="l">Ciclos detectados</div></div><div class="metric-tile"><div class="v" id="trackSamples">0</div><div class="l">Muestras completas</div></div><div class="metric-tile"><div class="v" id="trackExercises">0</div><div class="l">Ejercicios completados</div></div><div class="metric-tile"><div class="v" id="trackPractices">0</div><div class="l">Gestos practicados</div></div><div class="metric-tile"><div class="v" id="trackDemos">0</div><div class="l">Demostraciones</div></div></div></div>
+      </div>
+      <div class="card" style="margin-top:14px"><div class="status-line" style="justify-content:space-between"><h3 class="section-title" style="margin:0">Historial guardado</h3><div class="actions"><button id="btnCsvSession">Exportar sesión CSV</button><button id="btnCsvHistory">Exportar historial CSV</button></div></div><div id="historyList" class="history-list" style="margin-top:12px"></div></div>
+      <div class="notice" style="margin-top:14px">Los indicadores describen señales de los potenciómetros maestros y actividades del software. No representan rango articular clínico, recuperación funcional ni una medición de la posición física de la mano esclava.</div>
+    </section>
+  </main>
+  <p class="footer-note">ManoTerapia es un prototipo académico de ingeniería. Las secuencias y gestos de esta interfaz son demostrativos y no constituyen un protocolo clínico validado. Antes de probar movimientos automáticos, verifica los límites mecánicos y el funcionamiento del paro con la mano esclava sin contacto con una persona.</p>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+
+const NOMBRES = ['PULGAR','INDICE','MEDIO','ANULAR','MENIQUE'];
+const ETIQUETAS = ['Pulgar','Índice','Medio','Anular','Meñique'];
+const COLORES = ['#e45756','#f58518','#54a24b','#4c78a8','#b279a2'];
+const LINE_RE = /^(PULGAR|INDICE|MEDIO|ANULAR|MENIQUE)\s+raw:\s*(\d+)\s+\(min\s+(\d+)\s+max\s+(\d+)\)\s+(\d+)%\s+(\S+)/;
+const ROUTINE_TOLERANCE = 15;
+const STABLE_MS = 1200;
+const ROUTINES = [
+  {name:'Mano abierta',symbol:'✋',description:'Extiende los cinco dedos hasta alcanzar la posición abierta.',target:[0,0,0,0,0]},
+  {name:'Cierre de mano',symbol:'✊',description:'Flexiona los cinco dedos hasta alcanzar la posición de cierre.',target:[100,100,100,100,100]},
+  {name:'Flexión intermedia',symbol:'🖐',description:'Lleva los cinco dedos a una posición intermedia aproximada.',target:[50,50,50,50,50]},
+  {name:'Flexión del pulgar',symbol:'👍',description:'Flexiona el pulgar manteniendo los demás dedos extendidos.',target:[100,0,0,0,0]},
+  {name:'Flexión del índice',symbol:'☝',description:'Flexiona el índice manteniendo los demás dedos extendidos.',target:[0,100,0,0,0]},
+  {name:'Regreso a apertura',symbol:'✋',description:'Regresa a la posición abierta para finalizar la secuencia.',target:[0,0,0,0,0]}
+];
+const GESTURES = [
+  {id:'OPEN',name:'Mano abierta',symbol:'✋',description:'Los cinco dedos permanecen extendidos.',target:[0,0,0,0,0]},
+  {id:'FIST',name:'Puño',symbol:'✊',description:'Los cinco dedos se flexionan.',target:[100,100,100,100,100]},
+  {id:'THUMBS_UP',name:'Pulgar arriba',symbol:'👍',description:'Pulgar extendido y los demás dedos flexionados.',target:[0,100,100,100,100]},
+  {id:'PEACE',name:'Señal de paz',symbol:'✌',description:'Índice y medio extendidos; los demás dedos flexionados.',target:[100,0,0,100,100]},
+  {id:'POINT',name:'Señalamiento',symbol:'☝',description:'Índice extendido y los demás dedos flexionados.',target:[100,0,100,100,100]}
+];
+
+const datos = {};
+NOMBRES.forEach(n => datos[n] = {raw:0,min:0,max:0,pct:0,est:'--'});
+let port = null, writer = null, reader = null, readTask = null;
+let connected = false, servoOn = false, currentMode = 'MANUAL', disconnectRequested = false;
+let writeQueue = Promise.resolve();
+let commandCounter = 0;
+let filaActual = {};
+let lastFrame = [0,0,0,0,0];
+let sessionActive = false, sessionStartedAt = 0, sessionSamples = [], repetitions = 0, phase = null;
+let sessionExercises = 0, sessionPractices = 0, sessionDemos = 0;
+let routineActive = false, routineIndex = 0, routineCompleted = false, routineStableSince = null;
+let selectedGesture = null, practiceActive = false, practiceStableSince = null, practiceCompleted = false;
+let toastTimer = null;
+let sessions = [];
+try {
+  sessions = JSON.parse(localStorage.getItem('mt_sesiones_v2') || localStorage.getItem('mt_sesiones') || '[]');
+  if (!Array.isArray(sessions)) sessions = [];
+} catch (_) { sessions = []; }
+
+const $ = id => document.getElementById(id);
+const fmtTime = sec => `${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
+function showToast(message) {
+  const el = $('toast'); el.textContent = message; el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// Navegación
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === `view-${name}`));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.view === name));
+}
+document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
+document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => showView(b.dataset.go)));
+
+// Visualización de los cinco sensores
+function crearDedos() {
+  const cont = $('fingerGrid');
+  cont.innerHTML = NOMBRES.map((n,i) => `<div class="finger"><div class="fname">${ETIQUETAS[i].toUpperCase()}</div><div class="gauge"><div class="gauge-fill" id="fill${i}" style="background:${COLORES[i]}"></div></div><div class="value" id="pct${i}">--%</div><div class="state" id="state${i}">Sin lectura</div><div class="meta" id="meta${i}">RAW --</div></div>`).join('');
+}
+function pintarDedo(i) {
+  const d = datos[NOMBRES[i]];
+  $(`fill${i}`).style.height = `${d.pct}%`;
+  $(`pct${i}`).textContent = `${d.pct}%`;
+  $(`state${i}`).textContent = d.est;
+  $(`state${i}`).style.color = d.est === 'ABIERTO' ? 'var(--green)' : d.est === 'CERRADO' ? 'var(--amber)' : 'var(--muted)';
+  $(`meta${i}`).textContent = `RAW ${d.raw} · ${d.min}–${d.max}`;
+}
+
+function setConnectionUI(isConnected) {
+  connected = isConnected;
+  $('connectionPill').textContent = isConnected ? '● Conectado' : '● Desconectado';
+  $('connectionPill').className = `pill ${isConnected ? 'ok' : ''}`;
+  $('btnConnect').disabled = isConnected;
+  $('btnDisconnect').disabled = !isConnected;
+  $('btnServo').disabled = !isConnected;
+  $('btnCalReset').disabled = !isConnected;
+  $('btnManualMode').disabled = !isConnected;
+  $('btnStop').disabled = !isConnected;
+  $('btnRoutineStart').disabled = !isConnected || routineActive;
+  $('btnGestureDemo').disabled = !isConnected || !selectedGesture;
+  $('btnGesturePractice').disabled = !isConnected || !selectedGesture;
+  $('homeDot').className = `dot ${isConnected ? 'green' : 'red'}`;
+  $('homeStatus').textContent = isConnected ? 'ESP32 conectado y transmitiendo' : 'Esperando conexión con el ESP32';
+  if (!isConnected) {
+    servoOn = false;
+    routineActive = false; practiceActive = false;
+    routineStableSince = null; practiceStableSince = null;
+    $('btnRoutineStart').disabled = true;
+    $('btnRoutineNext').disabled = true;
+    $('btnRoutineCancel').disabled = true;
+    updateServoUI();
+  }
+}
+function updateServoUI() {
+  $('servoPill').textContent = `Servos: ${servoOn ? 'activos' : 'apagados'}`;
+  $('servoPill').className = `pill ${servoOn ? 'ok' : ''}`;
+  $('btnServo').textContent = servoOn ? 'Desactivar servos' : 'Activar servos';
+  $('btnServo').className = servoOn ? 'danger' : 'success';
+}
+function updateModeUI() {
+  $('modePill').textContent = `Modo: ${currentMode}`;
+  $('controlMode').textContent = `Modo: ${currentMode}`;
+}
+
+async function sendLine(line) {
+  if (!writer || !connected) {
+    showToast('Conecta el ESP32 antes de enviar comandos.');
+    throw new Error('Puerto serial no conectado');
+  }
+  const payload = new TextEncoder().encode(line.endsWith('\n') ? line : `${line}\n`);
+  writeQueue = writeQueue.then(() => writer.write(payload));
+  return writeQueue;
+}
+async function sendCommand(action, ...args) {
+  const id = String(++commandCounter).padStart(3,'0');
+  const line = ['CMD',id,action,...args].join('|');
+  await sendLine(line);
+  return id;
+}
+async function ensureServosOn() {
+  if (!servoOn) {
+    await sendCommand('SERVO','ON');
+    // Estado provisional hasta recibir ACK/estado de servo.
+    servoOn = true; updateServoUI();
+  }
+}
+
+async function readSerial(p) {
+  const decoder = new TextDecoderStream();
+  const pipeClosed = p.readable.pipeTo(decoder.writable).catch(() => {});
+  const localReader = decoder.readable.getReader();
+  reader = localReader;
+  let buffer = '';
+  try {
+    while (true) {
+      const {value,done} = await localReader.read();
+      if (done) break;
+      buffer += value;
+      let pos;
+      while ((pos = buffer.indexOf('\n')) >= 0) {
+        procesarLinea(buffer.slice(0,pos));
+        buffer = buffer.slice(pos+1);
+      }
+      if (buffer.length > 4096) buffer = '';
+    }
+  } catch (err) {
+    if (connected) console.warn('Lectura serial finalizada:', err);
+  } finally {
+    try { localReader.releaseLock(); } catch (_) {}
+    if (reader === localReader) reader = null;
+    try { await pipeClosed; } catch (_) {}
+    if (connected && !disconnectRequested && port === p) {
+      // Desconexion inesperada del USB: actualizar la interfaz y liberar recursos.
+      try { if (writer) { writer.releaseLock(); writer = null; } } catch (_) {}
+      try { await p.close(); } catch (_) {}
+      port = null;
+      setConnectionUI(false);
+      showToast('La conexión serial se interrumpió.');
+    }
+  }
+}
+
+async function conectar() {
+  if (!('serial' in navigator)) {
+    alert('Web Serial no está disponible. Utiliza Chrome o Edge en un contexto seguro (por ejemplo, localhost o HTTPS).');
+    return;
+  }
+  try {
+    port = await navigator.serial.requestPort();
+    await port.open({baudRate:115200});
+    writer = port.writable.getWriter();
+    setConnectionUI(true);
+    readTask = readSerial(port);
+    await sendCommand('STATUS','GET');
+    showToast('Conexión establecida a 115200 baudios.');
+  } catch (err) {
+    console.error(err);
+    showToast(`No se pudo conectar: ${err.message || err}`);
+    try { if (writer) { writer.releaseLock(); writer = null; } } catch (_) {}
+    try { if (port) await port.close(); } catch (_) {}
+    port = null; setConnectionUI(false);
+  }
+}
+async function desconectar() {
+  disconnectRequested = true;
+  try {
+    if (reader) await reader.cancel();
+    if (readTask) await readTask;
+  } catch (_) {}
+  try { if (writer) { writer.releaseLock(); writer = null; } } catch (_) {}
+  try { if (port) await port.close(); } catch (err) { console.warn(err); }
+  port = null; readTask = null; setConnectionUI(false);
+  disconnectRequested = false;
+  showToast('Puerto serial desconectado.');
+}
+$('btnConnect').addEventListener('click', conectar);
+$('btnDisconnect').addEventListener('click', desconectar);
+
+function procesarLinea(linea) {
+  const l = linea.trim();
+  if (!l) return;
+  const m = LINE_RE.exec(l);
+  if (m) {
+    const n = m[1];
+    datos[n] = {raw:+m[2],min:+m[3],max:+m[4],pct:+m[5],est:m[6]};
+    filaActual[n] = +m[5];
+    pintarDedo(NOMBRES.indexOf(n));
+    if (NOMBRES.every(k => Object.prototype.hasOwnProperty.call(filaActual,k))) {
+      lastFrame = NOMBRES.map(k => filaActual[k]);
+      recibirTramaCompleta(lastFrame);
+      filaActual = {};
+    }
+    return;
+  }
+  if (l.startsWith('==>')) {
+    $('handState').textContent = l.includes('CERRADA') ? 'CERRADA' : l.includes('ABIERTA') ? 'ABIERTA' : 'INTERMEDIA';
+    return;
+  }
+  if (l.startsWith('Servos:')) {
+    servoOn = l.toUpperCase().includes('ACTIVOS'); updateServoUI(); return;
+  }
+  if (l.startsWith('STATE|SERVO|')) {
+    const parts = l.split('|');
+    servoOn = parts[2] === 'ON'; currentMode = parts[4] || currentMode;
+    updateServoUI(); updateModeUI(); return;
+  }
+  if (l.startsWith('EVT|SERVO|')) {
+    servoOn = l.endsWith('|ON'); updateServoUI(); return;
+  }
+  if (l.startsWith('EVT|MODE|')) {
+    currentMode = l.split('|')[2] || currentMode; updateModeUI(); return;
+  }
+  if (l.startsWith('EVT|POSE|DONE|')) {
+    sessionDemos++;
+    $('gestureStatus').textContent = `Órdenes terminadas: ${l.split('|')[3]}`;
+    $('gestureResult').textContent = 'Órdenes enviadas';
+    updateTrackingMetrics();
+    showToast('Terminó la secuencia de órdenes del gesto. La posición física no está verificada.');
+    return;
+  }
+  if (l.startsWith('EVT|POSE|START|')) {
+    $('gestureStatus').textContent = `Demostrando: ${l.split('|')[3]}`; return;
+  }
+  if (l.startsWith('ACK|')) return;
+  if (l.startsWith('ERR|')) {
+    console.warn('ESP32:',l); showToast(`ESP32: ${l}`); return;
+  }
+}
+
+function recibirTramaCompleta(frame) {
+  lastFrame = frame;
+  updateLiveSummary();
+  const now = Date.now();
+  if (sessionActive) {
+    const elapsed = (now - sessionStartedAt)/1000;
+    sessionSamples.push({t:elapsed,pct:[...frame]});
+    if (sessionSamples.length > 30000) sessionSamples.shift();
+    const mean = frame.reduce((a,b)=>a+b,0)/5;
+    if (mean < 30) phase = 'open';
+    else if (mean > 70 && phase === 'open') { repetitions++; phase = 'closed'; }
+    updateSessionNumbers();
+  }
+  evaluateRoutine(frame,now);
+  evaluatePractice(frame,now);
+}
+
+// Rutinas guiadas: el siguiente paso queda bloqueado hasta cumplir el objetivo.
+function renderRoutineSteps() {
+  $('routineSteps').innerHTML = ROUTINES.map((step,i) => {
+    const state = routineActive && i < routineIndex ? 'done' : (routineActive && i === routineIndex ? 'current' : '');
+    const marker = state === 'done' ? '✓' : String(i+1);
+    const label = state === 'done' ? 'Completado' : state === 'current' ? 'En curso' : 'Pendiente';
+    return `<div class="step-item ${state}"><span class="step-no">${marker}</span><span class="step-name">${escapeHtml(step.name)}</span><span class="step-state">${label}</span></div>`;
+  }).join('');
+}
+function renderRoutineTargets() {
+  const step = ROUTINES[routineIndex];
+  if (!step) return;
+  $('routineTargets').innerHTML = step.target.map((v,i)=>`<div class="target-row"><span>${ETIQUETAS[i]}</span><div class="track"><span style="width:${v}%"></span></div><span class="num">${v}%</span></div>`).join('');
+  $('routineTitle').textContent = step.name;
+  $('routineSymbol').textContent = step.symbol;
+  $('routineDescription').textContent = step.description;
+  $('routineStepLabel').textContent = `Ejercicio ${routineIndex+1} de ${ROUTINES.length}`;
+  $('routineProgressText').textContent = `${Math.round((routineIndex/ROUTINES.length)*100)}% completado`;
+  $('routineProgress').style.width = `${(routineIndex/ROUTINES.length)*100}%`;
+  renderRoutineSteps();
+}
+async function iniciarRutina() {
+  if (!connected) { showToast('Conecta el ESP32 antes de iniciar una rutina.'); return; }
+  try {
+    await ensureServosOn();
+    await sendCommand('MODE','ROUTINE');
+    routineActive = true; routineIndex = 0; routineCompleted = false; routineStableSince = null;
+    $('routineState').textContent = 'Rutina en curso';
+    $('btnRoutineStart').disabled = true; $('btnRoutineNext').disabled = true; $('btnRoutineCancel').disabled = false;
+    $('routineSuccess').classList.add('hidden');
+    $('routineFeedback').textContent = 'Realiza el movimiento indicado. El objetivo debe mantenerse estable durante al menos 1,2 segundos.';
+    renderRoutineTargets();
+    showToast('Rutina iniciada. El modo de control sigue la mano maestra.');
+  } catch (_) {}
+}
+function evaluateRoutine(frame,now) {
+  if (!routineActive || routineCompleted) return;
+  const target = ROUTINES[routineIndex].target;
+  const reached = frame.every((v,i)=>Math.abs(v-target[i])<=ROUTINE_TOLERANCE);
+  if (reached) {
+    if (routineStableSince === null) routineStableSince = now;
+    const stable = now - routineStableSince;
+    $('routineFeedback').textContent = `Objetivo alcanzado. Mantén la posición: ${Math.min(100,Math.round(stable/STABLE_MS*100))}% del tiempo requerido.`;
+    if (stable >= STABLE_MS) {
+      routineCompleted = true; sessionExercises++;
+      $('routineSuccess').classList.remove('hidden');
+      $('routineFeedback').textContent = 'Ejercicio completado. El siguiente paso está habilitado.';
+      $('btnRoutineNext').disabled = false;
+      $('routineState').textContent = 'Ejercicio completado';
+      updateTrackingMetrics(); renderRoutineSteps();
+      showToast(`Completaste: ${ROUTINES[routineIndex].name}`);
+    }
+  } else {
+    routineStableSince = null;
+    const differences = frame.map((v,i)=>Math.abs(v-target[i]));
+    const worst = differences.indexOf(Math.max(...differences));
+    $('routineFeedback').textContent = `Aún no se alcanza el objetivo. Revisa principalmente ${ETIQUETAS[worst].toLowerCase()}.`;
+  }
+}
+function siguienteEjercicio() {
+  if (!routineActive || !routineCompleted) return;
+  if (routineIndex >= ROUTINES.length-1) {
+    finalizarRutina(); return;
+  }
+  routineIndex++; routineCompleted = false; routineStableSince = null;
+  $('routineSuccess').classList.add('hidden'); $('btnRoutineNext').disabled = true;
+  $('routineState').textContent = 'Rutina en curso';
+  $('routineProgressText').textContent = `${Math.round((routineIndex/ROUTINES.length)*100)}% completado`;
+  renderRoutineTargets();
+}
+async function finalizarRutina() {
+  routineActive = false; routineStableSince = null;
+  $('routineState').textContent = 'Rutina finalizada';
+  $('btnRoutineStart').disabled = false; $('btnRoutineNext').disabled = true; $('btnRoutineCancel').disabled = true;
+  $('routineProgress').style.width = '100%'; $('routineProgressText').textContent = '100% completado';
+  $('routineFeedback').textContent = 'La secuencia ha finalizado.';
+  renderRoutineSteps();
+  if (connected) { try { await sendCommand('MODE','MANUAL'); } catch (_) {} }
+  showToast('Rutina finalizada.');
+}
+async function cancelarRutina() {
+  routineActive = false; routineCompleted = false; routineStableSince = null;
+  $('routineState').textContent = 'Rutina cancelada';
+  $('btnRoutineStart').disabled = false; $('btnRoutineNext').disabled = true; $('btnRoutineCancel').disabled = true;
+  $('routineSuccess').classList.add('hidden'); $('routineFeedback').textContent = 'La rutina se detuvo antes de terminar.';
+  renderRoutineSteps();
+  if (connected) { try { await sendCommand('MODE','MANUAL'); } catch (_) {} }
+}
+$('btnRoutineStart').addEventListener('click',iniciarRutina);
+$('btnRoutineNext').addEventListener('click',siguienteEjercicio);
+$('btnRoutineCancel').addEventListener('click',cancelarRutina);
+
+// Biblioteca de gestos
+function renderGestureCards() {
+  $('gestureGrid').innerHTML = GESTURES.map(g=>`<article class="card gesture-card"><div class="gesture-art">${g.symbol}</div><h3>${escapeHtml(g.name)}</h3><p>${escapeHtml(g.description)}</p><button data-gesture="${g.id}">Seleccionar gesto</button></article>`).join('');
+  $('gestureGrid').querySelectorAll('[data-gesture]').forEach(btn=>btn.addEventListener('click',()=>seleccionarGesto(btn.dataset.gesture)));
+}
+function seleccionarGesto(id) {
+  selectedGesture = GESTURES.find(g=>g.id===id) || null;
+  if (!selectedGesture) return;
+  $('selectedGestureTitle').textContent = selectedGesture.name;
+  $('selectedGestureDesc').textContent = selectedGesture.description;
+  $('gestureStatus').textContent = `Seleccionado: ${selectedGesture.name}`;
+  $('gestureResult').textContent = 'Sin evaluar';
+  $('gestureTargets').innerHTML = selectedGesture.target.map((v,i)=>`<div class="target-row"><span>${ETIQUETAS[i]}</span><div class="track"><span style="width:${v}%"></span></div><span class="num">${v}%</span></div>`).join('');
+  $('btnGestureDemo').disabled = !connected;
+  $('btnGesturePractice').disabled = !connected;
+  $('practiceSuccess').classList.add('hidden');
+}
+async function demostrarGesto() {
+  if (!selectedGesture || !connected) return;
+  try {
+    await ensureServosOn();
+    await sendCommand('MODE','GESTURE_DEMO');
+    await sendCommand('POSE',selectedGesture.id,selectedGesture.target.join(','));
+    $('gestureStatus').textContent = `Demostrando: ${selectedGesture.name}`;
+    $('gestureResult').textContent = 'Órdenes en ejecución';
+    showToast(`Orden de demostración enviada: ${selectedGesture.name}`);
+  } catch (_) {}
+}
+async function practicarGesto() {
+  if (!selectedGesture || !connected) return;
+  try {
+    await ensureServosOn();
+    await sendCommand('MODE','GESTURE_PRACTICE');
+    practiceActive = true; practiceStableSince = null; practiceCompleted = false;
+    $('practiceSuccess').classList.add('hidden'); $('gestureResult').textContent = 'Práctica en curso';
+    $('gestureStatus').textContent = `Practicando: ${selectedGesture.name}`;
+    showToast('Reproduce el gesto con la mano maestra y mantén la posición.');
+  } catch (_) {}
+}
+function evaluatePractice(frame,now) {
+  if (!practiceActive || practiceCompleted || !selectedGesture) return;
+  const reached = frame.every((v,i)=>Math.abs(v-selectedGesture.target[i])<=ROUTINE_TOLERANCE);
+  if (reached) {
+    if (practiceStableSince === null) practiceStableSince = now;
+    if (now-practiceStableSince >= STABLE_MS) {
+      practiceCompleted = true; practiceActive = false; sessionPractices++;
+      $('practiceSuccess').classList.remove('hidden'); $('gestureResult').textContent = 'Completado';
+      $('gestureStatus').textContent = `Gesto practicado: ${selectedGesture.name}`;
+      updateTrackingMetrics(); showToast('Gesto completado según los sensores maestros.');
+    }
+  } else practiceStableSince = null;
+}
+$('btnGestureDemo').addEventListener('click',demostrarGesto);
+$('btnGesturePractice').addEventListener('click',practicarGesto);
+
+// Control general
+$('btnServo').addEventListener('click',async()=>{
+  if (!connected) return;
+  try {
+    if (servoOn) await sendCommand('SERVO','OFF');
+    else await sendCommand('SERVO','ON');
+  } catch (_) {}
+});
+$('btnCalReset').addEventListener('click',async()=>{try{await sendCommand('CAL','RESET');showToast('Mínimos y máximos reiniciados.');}catch(_){}});
+$('btnManualMode').addEventListener('click',async()=>{
+  if (!connected) return;
+  try { await sendCommand('MODE','MANUAL'); await ensureServosOn(); showView('control'); showToast('Control espejo activado.'); } catch (_) {}
+});
+$('btnStop').addEventListener('click',async()=>{
+  if (!connected) return;
+  if (!confirm('¿Detener la actividad y desactivar las señales de los cinco servos?')) return;
+  try {
+    await sendCommand('STOP');
+    routineActive = false; practiceActive = false;
+    $('btnRoutineStart').disabled = false; $('btnRoutineNext').disabled = true; $('btnRoutineCancel').disabled = true;
+    $('routineState').textContent = 'Detenida';
+    showToast('Orden de parada enviada. Verifica el comportamiento mecánico.');
+  } catch (_) {}
+});
+
+// Sesiones e historial
+function iniciarSesion() {
+  sessionActive = true; sessionStartedAt = Date.now(); sessionSamples = []; repetitions = 0; phase = null;
+  sessionExercises = 0; sessionPractices = 0; sessionDemos = 0;
+  $('trackingState').textContent = 'Sesión en curso';
+  updateSessionNumbers(); showToast('Nueva sesión iniciada.');
+}
+function descartarSesion() {
+  if (!confirm('¿Descartar los datos de la sesión actual?')) return;
+  sessionActive = false; sessionStartedAt = 0; sessionSamples = []; repetitions = 0; phase = null;
+  sessionExercises = 0; sessionPractices = 0; sessionDemos = 0;
+  $('trackingState').textContent = 'Sin sesión activa'; updateSessionNumbers();
+}
+function updateSessionNumbers() {
+  const seconds = sessionActive ? Math.floor((Date.now()-sessionStartedAt)/1000) : 0;
+  $('sessionTime').textContent = fmtTime(seconds);
+  $('trackDuration').textContent = fmtTime(seconds);
+  $('repCount').textContent = repetitions;
+  $('trackReps').textContent = repetitions;
+  $('trackSamples').textContent = sessionSamples.length;
+  $('trackExercises').textContent = sessionExercises;
+  $('trackPractices').textContent = sessionPractices;
+  $('trackDemos').textContent = sessionDemos;
+  $('trackingState').textContent = sessionActive ? 'Sesión en curso' : 'Sin sesión activa';
+}
+function obtenerMetricasSesion() {
+  if (sessionSamples.length < 10) return null;
+  const ranges = NOMBRES.map((_,i)=>{
+    const vals = sessionSamples.map(s=>s.pct[i]);
+    return Math.max(...vals)-Math.min(...vals);
+  });
+  let variation = 0;
+  for (let j=1;j<sessionSamples.length;j++) {
+    const a=sessionSamples[j-1].pct.reduce((x,y)=>x+y,0)/5;
+    const b=sessionSamples[j].pct.reduce((x,y)=>x+y,0)/5;
+    variation += Math.abs(b-a);
+  }
+  const duration = sessionSamples[sessionSamples.length-1].t - sessionSamples[0].t;
+  return {date:Date.now(),code:$('sessionCode').value.trim(),duration:Math.round(duration),repetitions,ranges,meanRange:ranges.reduce((a,b)=>a+b,0)/5,signalVariationRate:duration?variation/duration:0,samples:sessionSamples.length,exercises:sessionExercises,practices:sessionPractices,demos:sessionDemos};
+}
+function saveSession() {
+  if (!sessionActive) { showToast('No hay una sesión activa.'); return; }
+  const code = $('sessionCode').value.trim();
+  if (!code) { alert('Escribe un código de prueba o sesión.'); return; }
+  const record = obtenerMetricasSesion();
+  if (!record) { alert('Se necesitan al menos 10 tramas completas para guardar una sesión.'); return; }
+  sessions.push(record);
+  try { localStorage.setItem('mt_sesiones_v2',JSON.stringify(sessions)); } catch (err) { alert('No se pudo guardar el historial del navegador.'); return; }
+  sessionActive = false; renderHistory(); updateSessionNumbers(); showToast('Sesión guardada en este navegador.');
+}
+function meanRangeOf(record) { return Number(record.meanRange ?? record.romMedia ?? 0); }
+function renderHistory() {
+  const list = $('historyList');
+  if (!sessions.length) { list.innerHTML = '<div class="empty">Todavía no hay sesiones guardadas.</div>'; return; }
+  list.innerHTML = sessions.slice().reverse().map((s,idx)=>{
+    const date = new Date(s.date ?? s.fecha ?? Date.now()).toLocaleString('es-CO');
+    const code = s.code ?? s.pac ?? 'Sin código';
+    const range = meanRangeOf(s).toFixed(1);
+    const duration = s.duration ?? s.dur ?? 0;
+    const reps = s.repetitions ?? s.reps ?? 0;
+    return `<div class="history-item"><div><strong>${escapeHtml(code)}</strong><div class="small">${escapeHtml(date)} · ${duration}s · ${reps} ciclos</div></div><div style="text-align:right"><strong>${range}%</strong><div class="small">Rango medio de señal</div></div></div>`;
+  }).join('');
+}
+function csvCell(value) { const s=String(value ?? ''); return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; }
+function downloadFile(name,text) {
+  const blob = new Blob([text],{type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function exportSessionCsv() {
+  if (!sessionSamples.length) { showToast('No hay muestras de la sesión actual.'); return; }
+  const lines = [['tiempo_s',...NOMBRES],...sessionSamples.map(s=>[s.t.toFixed(2),...s.pct])];
+  downloadFile('manoterapia_sesion.csv',lines.map(r=>r.map(csvCell).join(',')).join('\n'));
+}
+function exportHistoryCsv() {
+  if (!sessions.length) { showToast('No hay historial para exportar.'); return; }
+  const header=['codigo','fecha','duracion_s','ciclos','muestras','rango_senal_medio',...NOMBRES.map(n=>`rango_${n}`),'ejercicios','gestos_practicados','demostraciones'];
+  const rows=sessions.map(s=>[
+    s.code ?? s.pac ?? '',new Date(s.date ?? s.fecha ?? Date.now()).toISOString(),s.duration ?? s.dur ?? 0,s.repetitions ?? s.reps ?? 0,s.samples ?? '',meanRangeOf(s).toFixed(1),...(s.ranges ?? s.rom ?? [0,0,0,0,0]).map(v=>Number(v).toFixed(1)),s.exercises ?? '',s.practices ?? '',s.demos ?? ''
+  ]);
+  downloadFile('manoterapia_historial.csv',[header,...rows].map(r=>r.map(csvCell).join(',')).join('\n'));
+}
+$('btnStartSession').addEventListener('click',iniciarSesion);
+$('btnSaveSession').addEventListener('click',saveSession);
+$('btnDiscardSession').addEventListener('click',descartarSesion);
+$('btnCsvSession').addEventListener('click',exportSessionCsv);
+$('btnCsvHistory').addEventListener('click',exportHistoryCsv);
+
+// Indicadores en vivo
+function updateLiveSummary() {
+  const mean=lastFrame.reduce((a,b)=>a+b,0)/5;
+  $('meanFlex').textContent = `${Math.round(mean)}%`;
+}
+setInterval(()=>{
+  if(sessionActive) updateSessionNumbers();
+},1000);
+
+crearDedos();
+renderRoutineTargets();
+renderGestureCards();
+renderHistory();
+updateServoUI();
+updateModeUI();
+setConnectionUI(false);
+GESTURES.forEach((g,i)=>{ if(i===0) seleccionarGesto(g.id); });
+$('routineTargets').innerHTML = ROUTINES[0].target.map((v,i)=>`<div class="target-row"><span>${ETIQUETAS[i]}</span><div class="track"><span style="width:${v}%"></span></div><span class="num">${v}%</span></div>`).join('');
+
+// Las cinco tarjetas empiezan sin datos; la primera trama válida las actualiza.
+window.addEventListener('beforeunload',()=>{
+  try { if(writer) writer.releaseLock(); } catch (_) {}
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# Sesiones, datos personales y secretos
+*.csv
+.env
+.env.*
+*.key
+*.pem
+node_modules/
+work/
+Thumbs.db
+Desktop.ini
+.DS_Store
