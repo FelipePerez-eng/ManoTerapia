@@ -88,7 +88,7 @@ Los archivos proceden del proyecto `Placa` de METIE, creado con **KiCad 10**. Ab
 
 El esquema y la PCB no se rediseñaron durante la organización. Los modelos 3D externos no se incluyen; las huellas pueden conservar referencias a `KICAD_USER_3DMODEL_DIR`. No publicar archivos de fabricación como validados hasta revisar el diseño y su correspondencia con el montaje.
 
-<img width="735" height="325" alt="Esquematico" src="https://github.com/user-attachments/assets/725c1a6b-389b-4fb6-9d05-4f8647cee697" />
+<img width="635" height="325" alt="Esquematico" src="https://github.com/user-attachments/assets/725c1a6b-389b-4fb6-9d05-4f8647cee697" />
 
 ## Estado y límites
 
