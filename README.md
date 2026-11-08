@@ -85,7 +85,7 @@ La lectura disminuye al cerrar la mano. La calibración utiliza esos extremos si
 
 ## KiCad
 
-![Esquemático de ManoTerapia: ESP32, potenciómetros, señales de servos, pulsador y conectores](docs/imagenes/Esquematico.webp)
+![Esquemático de ManoTerapia: ESP32, potenciómetros, señales de servos, pulsador y conectores](https://raw.githubusercontent.com/FelipePerez-eng/ManoTerapia/main/docs/imagenes/Esquematico.webp)
 
 Esquemático compartido por el equipo. Los conectores flex aparecen en el diseño, pero no se utilizan en el firmware vigente. Para consultar la edición actual, abre el archivo `.kicad_sch` del proyecto.
 
