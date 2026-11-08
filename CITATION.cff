@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "Si utilizas ManoTerapia en un trabajo, presentación o investigación, por favor cita este proyecto con estos datos."
+type: software
+title: "ManoTerapia"
+authors:
+  - family-names: "Perez"
+    given-names: "Felipe"
+  - family-names: "Guzman"
+    given-names: "Brenda"
+  - family-names: "Solorzano"
+    given-names: "David"
+repository-code: "https://github.com/FelipePerez-eng/ManoTerapia"
+url: "https://github.com/FelipePerez-eng/ManoTerapia"
+abstract: "Prototipo académico de mano robótica maestro–esclavo con ESP32, control espejo, gestos, rutinas y seguimiento de pruebas. METIE, Universidad de Ibagué."
+keywords:
+  - "mano robótica"
+  - "ESP32"
+  - "ingeniería electrónica"
+  - "METIE"

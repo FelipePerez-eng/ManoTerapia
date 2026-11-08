@@ -4,6 +4,8 @@
 
 **Equipo:** Felipe Perez · Brenda Guzman · David Solorzano
 
+© 2026 Felipe Perez, Brenda Guzman y David Solorzano. Código y documentación originales bajo [licencia MIT](LICENSE). [Autoría, materiales de terceros y asistencia de IA](NOTICE.md).
+
 Prototipo de mano robótica maestro–esclavo con ESP32, cinco potenciómetros y cinco servomotores MG90S. El dashboard permite usar control espejo, practicar gestos, ejecutar demostraciones, realizar rutinas y guardar resultados de pruebas en CSV.
 
 ## Qué archivo usar
@@ -98,6 +100,20 @@ El esquema y la PCB no se rediseñaron durante la organización. Los modelos 3D 
 El usuario reportó mejoras tras resoldar conexiones y probar las variantes de calibración y filtrado. **Siguen pendientes los pequeños saltos esporádicos de los servos y la respuesta intermitente del pulsador.** No se consideran resueltos por la reorganización.
 
 El dashboard mide señales de los potenciómetros de la mano maestra. No mide la posición física de la mano esclava. Una demostración terminada indica que acabó la secuencia de órdenes, no que la postura física se haya verificado. Las rutinas son demostraciones del prototipo académico, no un protocolo clínico validado.
+
+## Cómo citar el proyecto
+
+Si utilizas ManoTerapia como referencia en una presentación, trabajo académico o investigación, por favor incluye esta cita:
+
+> Perez, F., Guzman, B., y Solorzano, D. (2026). *ManoTerapia* [Software de prototipo académico]. GitHub. https://github.com/FelipePerez-eng/ManoTerapia
+
+El archivo [CITATION.cff](CITATION.cff) facilita la opción **Cite this repository** de GitHub. La cita académica se solicita como reconocimiento; la condición de MIT es conservar el aviso de copyright y la licencia en las copias o partes sustanciales correspondientes.
+
+## Desarrollo con asistencia de IA
+
+El proyecto contó con asistencia de **ChatGPT/Codex de OpenAI** para apoyar la programación, el diseño de la interfaz, la documentación, la revisión de código y las pruebas simuladas. La revisión e integración física corresponden al equipo. Esta asistencia no implica certificación técnica ni validación clínica.
+
+Consulta [NOTICE.md](NOTICE.md) para el alcance de la licencia y los materiales de terceros, incluidos los recursos institucionales y las bibliotecas externas.
 
 ## Pruebas y versiones
 
