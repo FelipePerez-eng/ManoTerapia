@@ -696,14 +696,18 @@ syncPresentationState();
 const diagnosticEntries = [];
 function recordDiagnostic(kind, message){
   diagnosticEntries.push(new Date().toISOString()+' | '+kind+' | '+String(message).slice(0,400));
-  if(diagnosticEntries.length>100) diagnosticEntries.shift();
+  if(diagnosticEntries.length>500) diagnosticEntries.shift();
   const output=document.getElementById('diagnosticLog');
   if(output) output.textContent=diagnosticEntries.join('\n');
 }
 const originalDiagnosticParser=procesarLinea;
+let lastDiagnosticServoReport=null;
 procesarLinea=function(line){
   const text=String(line).trim();
-  if(text && !LINE_RE.test(text) && !text.startsWith('==>')){
+  const periodicServoReport=text.startsWith('Servos:');
+  const repeatedServoReport=periodicServoReport && text===lastDiagnosticServoReport;
+  if(periodicServoReport) lastDiagnosticServoReport=text;
+  if(text && !LINE_RE.test(text) && !text.startsWith('==>') && !/^-+$/.test(text) && !repeatedServoReport){
     recordDiagnostic('ESP32',text);
   }
   return originalDiagnosticParser(line);
@@ -725,7 +729,7 @@ document.getElementById('btnDiagnosticSave').addEventListener('click',()=>{
   const link=document.createElement('a');link.href=url;link.download='ManoTerapia_diagnostico.txt';link.click();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
 });
-recordDiagnostic('INICIO','Registro listo. No contiene muestras de sensores ni códigos de sesión.');
+recordDiagnostic('INICIO','Registro v2: conserva 500 eventos, omite separadores y estados periódicos repetidos. Descárgalo justo después del fallo.');
 </script>
 </body>
 </html>
