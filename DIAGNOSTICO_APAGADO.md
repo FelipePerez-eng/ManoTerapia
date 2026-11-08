@@ -4,7 +4,11 @@ Síntoma informado: la interfaz pasa a «Servos apagados». El usuario indica al
 
 Abrir `ManoTerapia_dashboard_diagnostico.html` y cerrar las demás conexiones al puerto (dashboard anterior y Monitor Serial). No es necesario cargar otro firmware para este registro. Ante una nueva aparición del fallo, pulsar «Descargar registro» antes de cerrar o recargar la página.
 
-El registro conserva los últimos 100 eventos: solicitudes de comandos, resultado de escritura, mensajes no sensoriales del ESP32 y cambios de conexión. No añade órdenes ni reactivación automática. No contiene las muestras de sensores ni códigos de sesión. Un registro lleno de mensajes periódicos puede desplazar eventos anteriores; descargarlo en cuanto ocurra el fallo.
+El registro actualizado conserva los últimos 500 eventos: solicitudes de comandos, resultado de escritura, mensajes no sensoriales del ESP32 y cambios de conexión. Omite separadores y estados periódicos repetidos; siempre procesa esos mensajes con la lógica original del dashboard. No añade órdenes ni reactivación automática. No contiene las muestras de sensores ni códigos de sesión. Descargarlo en cuanto ocurra el fallo.
+
+## Primer registro recibido
+
+El fragmento recibido contiene un único cambio de estado: apagados a activos; después permanecen activos. No contiene una transición a apagados, una solicitud de apagado ni un mensaje de reinicio. No permite atribuir el problema al pulsador, a la alimentación ni al dashboard. La versión inicial almacenaba solo 100 eventos y podía desplazar transiciones importantes con mensajes repetidos; se amplía y filtra el registro para la siguiente observación. No se cambió el firmware.
 
 Interpretación orientativa, sin atribuir una causa definitiva:
 
