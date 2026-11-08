@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Diagnóstico · ManoTerapia V2 | METIE · Universidad de Ibagué</title>
+<title>ManoTerapia V2 | METIE · Universidad de Ibagué</title>
 <style>
 :root{--bg:#f3f6fb;--surface:#fff;--surface2:#f8faff;--text:#172238;--muted:#68758b;--border:#dce4ef;--blue:#2864dc;--blue2:#eaf1ff;--green:#15966b;--green2:#e8f7f1;--amber:#bd7b13;--amber2:#fff4df;--red:#cc4848;--red2:#fff0f0;--shadow:0 10px 30px rgba(25,45,80,.06)}
 
@@ -105,7 +105,7 @@ html{scroll-behavior:smooth;scroll-padding-top:86px}::selection{background:#c6e1
       <div class="card" style="margin-top:14px"><div class="status-line" style="justify-content:space-between"><h3 class="section-title" style="margin:0">Historial guardado</h3><div class="actions"><button id="btnCsvSession">Exportar sesión CSV</button><button id="btnCsvHistory">Exportar historial CSV</button></div></div><div id="historyList" class="history-list" style="margin-top:12px"></div></div>
       <div class="notice" style="margin-top:14px">Los indicadores describen señales de los potenciómetros maestros y actividades del software. No representan rango articular clínico, recuperación funcional ni una medición de la posición física de la mano esclava.</div>
     </section>
-  <details class="card" open style="margin-top:24px"><summary style="cursor:pointer;font-weight:600">Diagnóstico del apagado</summary><p class="small">Si vuelve a ocurrir, descarga el registro antes de cerrar o recargar esta página. No abras el Monitor Serial a la vez. Una línea de arranque indica que el firmware inició, pero este registro no determina por sí solo la causa del reinicio.</p><button id="btnDiagnosticSave" type="button">Descargar registro</button><pre id="diagnosticLog" style="white-space:pre-wrap;overflow-wrap:anywhere;max-height:230px;overflow:auto;font-size:11px;background:var(--surface2);padding:12px" aria-label="Registro de conexión y eventos"></pre></details></main>
+
   <p class="footer-note">ManoTerapia es un prototipo académico de ingeniería. Las secuencias y gestos de esta interfaz son demostrativos y no constituyen un protocolo clínico validado. Antes de probar movimientos automáticos, verifica los límites mecánicos y el funcionamiento del paro con la mano esclava sin contacto con una persona.</p>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -709,45 +709,6 @@ document.querySelectorAll('[data-gesture], .nav button').forEach(button=>button.
 syncPresentationState();
 </script>
 
-<script>
-// Diagnóstico pasivo: registra eventos; no envía órdenes nuevas ni reactiva servos.
-const diagnosticEntries = [];
-function recordDiagnostic(kind, message){
-  diagnosticEntries.push(new Date().toISOString()+' | '+kind+' | '+String(message).slice(0,400));
-  if(diagnosticEntries.length>500) diagnosticEntries.shift();
-  const output=document.getElementById('diagnosticLog');
-  if(output) output.textContent=diagnosticEntries.join('\n');
-}
-const originalDiagnosticParser=procesarLinea;
-let lastDiagnosticServoReport=null;
-procesarLinea=function(line){
-  const text=String(line).trim();
-  const periodicServoReport=text.startsWith('Servos:');
-  const repeatedServoReport=periodicServoReport && text===lastDiagnosticServoReport;
-  if(periodicServoReport) lastDiagnosticServoReport=text;
-  if(text && !LINE_RE.test(text) && !text.startsWith('==>') && !/^-+$/.test(text) && !repeatedServoReport){
-    recordDiagnostic('ESP32',text);
-  }
-  return originalDiagnosticParser(line);
-};
-const originalDiagnosticSend=sendLine;
-sendLine=async function(line){
-  recordDiagnostic('SOLICITUD',String(line).trim());
-  try { const result=await originalDiagnosticSend(line);recordDiagnostic('ESCRITURA','Completada; no equivale a confirmación del ESP32.');return result; }
-  catch(error){recordDiagnostic('ERROR DE ENVÍO',error.message||String(error));throw error;}
-};
-const originalDiagnosticConnection=setConnectionUI;
-setConnectionUI=function(value){
-  recordDiagnostic('CONEXIÓN',value?'Puerto abierto':'Puerto cerrado o conexión perdida');
-  return originalDiagnosticConnection(value);
-};
-document.getElementById('btnDiagnosticSave').addEventListener('click',()=>{
-  const blob=new Blob([diagnosticEntries.join('\n')],{type:'text/plain;charset=utf-8'});
-  const url=URL.createObjectURL(blob);
-  const link=document.createElement('a');link.href=url;link.download='ManoTerapia_diagnostico.txt';link.click();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
-});
-recordDiagnostic('INICIO','Registro v2: conserva 500 eventos, omite separadores y estados periódicos repetidos. Descárgalo justo después del fallo.');
-</script>
+
 </body>
 </html>
