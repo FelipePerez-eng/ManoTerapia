@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-Dashboard autónomo en HTML, CSS y JavaScript, sin dependencias externas. Archivo vigente: `outputs/ManoTerapia_dashboard_v2.html`.
+Dashboard autónomo en HTML, CSS y JavaScript, sin dependencias externas. Archivo vigente: `dashboard/ManoTerapia.html`.
 
 ## Users
 
@@ -43,12 +43,13 @@ Preferencias confirmadas: interfaz clara blanca y azul, presentación académica
 
 ## Evidence on Hand
 
-- Dashboard funcional de referencia conservado en `outputs/ManoTerapia_dashboard_v1_BACKUP.html`.
-- Banner METIE aportado por el usuario, incorporado en el HTML vigente.
-- Versión anterior al último ajuste: `outputs/ManoTerapia_dashboard_v2_respaldo_anterior.html`.
-- Firmware de referencia inspeccionado en el paquete local `Downloads/ManoTerapia_v1_paquete/ManoTerapia_ESP32_v1/ManoTerapia_ESP32_v1.ino`.
-- Pruebas de sintaxis y de comportamiento con datos simulados en `work/verify.cjs`. No hay verificación física de los nuevos gestos ni inspección visual en navegador registrada.
-- El usuario informó que control espejo, gestos originales y rutinas funcionaban en el prototipo V1; mencionó ajustes físicos de ensamblaje pendientes.
+- Dashboard vigente en dashboard/ManoTerapia.html y firmware en firmware/ManoTerapia_ESP32/ManoTerapia_ESP32.ino.
+- Esquema, PCB y bibliotecas locales en hardware/kicad, a partir de la carpeta Placa confirmada por el usuario.
+- Banner METIE aportado por el usuario e incorporado en el dashboard.
+- Pruebas simuladas en tests/verificar.cjs. Versiones previas recuperables desde el historial de Git.
+- Usuario confirma servos MG90S y fuente externa de 5 V; amperaje desconocido. Persisten pequeños saltos sin tocar el circuito y respuesta intermitente del pulsador.
+- Flex sin implementar. La versión actual exige Finalizar antes de cambiar de sección durante una actividad y utiliza ventana flotante minimizable para gestos.
+- No afirmar validación física completa ni diseño KiCad libre de incidencias.
 
 ## Product Principles
 

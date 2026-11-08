@@ -2,7 +2,7 @@
 
 ## Alcance
 
-Dashboard académico en `outputs/ManoTerapia_dashboard_v2.html`. Estética clara, blanca y azul, orientada a operar y explicar el prototipo durante la muestra. Conservar identidad institucional y comportamiento documentados en PRODUCT.md.
+Dashboard académico vigente en `dashboard/ManoTerapia.html`. Estética clara, blanca y azul, orientada a operar y explicar el prototipo durante la muestra. Conservar identidad institucional y comportamiento documentados en PRODUCT.md.
 
 ## Composición
 
@@ -15,6 +15,8 @@ Las vistas operativas usan encabezados alineados a la izquierda, datos agrupados
 Fondo #f4f7fa, texto #17334e, texto secundario #50657a, azul de acción #1258a0 y azul profundo #173f67. Tipografía de sistema Segoe UI para conservar el archivo autónomo. Radios de 12–14 px y separación generosa entre grupos. Sombras reservadas para la navegación persistente; superficies de contenido delimitadas por bordes. Emojis representativos en gestos y rutinas por preferencia explícita del usuario.
 
 ## Interacción y movimiento
+
+Al elegir un gesto, sus opciones Automático, Manual y Finalizar aparecen en una ventana flotante no modal; las tarjetas no crecen ni se desplazan. Se puede minimizar, restaurar y cerrar. Si hay actividad al ocultarla, una barra conserva acceso a Abrir y Finalizar. Por decisión del usuario, una actividad de gesto o rutina bloquea la navegación hasta su finalización explícita. Completar el objetivo de un gesto no sustituye pulsar Finalizar. El dashboard operativo no muestra el panel de diagnóstico.
 
 Entrada breve al cambiar de vista, transición de barras de progreso y elevación discreta de tarjetas de gestos al pasar el puntero. Sin animaciones continuas ni simulación de actividad del hardware. Respeta prefers-reduced-motion. Foco de teclado visible, botones de al menos 42 px y navegación desplazable en pantallas pequeñas.
 

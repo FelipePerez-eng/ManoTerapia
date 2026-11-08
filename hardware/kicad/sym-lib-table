@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "MisFootprints") (type "KiCad") (uri "${KIPRJMOD}/Library.pretty/38pin_ESP32-DEVKITC.kicad_sym") (options "") (descr "Simbolo ESP32 local"))
+)

@@ -1,0 +1,52 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert'),path=require('path');
+const html=fs.readFileSync(path.join(__dirname,'../dashboard/ManoTerapia.html'),'utf8');
+const firmware=fs.readFileSync(path.join(__dirname,'../firmware/ManoTerapia_ESP32/ManoTerapia_ESP32.ino'),'utf8');
+const values=name=>firmware.match(new RegExp(name+'\\[NUM\\]\\s*=\\s*\\{([^}]+)\\}'))[1].split(',').map(Number);
+assert.deepStrictEqual(values('PINES_SERVO'),[23,22,21,19,18]);
+assert.deepStrictEqual(values('PINES_POT'),[33,32,35,34,36]);
+assert.deepStrictEqual(values('potCerrado'),[3800,2700,2500,2800,3100]);
+assert(firmware.includes('HISTERESIS_SERVO_GRADOS = 2'));assert(firmware.includes('ANTIRREBOTE_MS = 60'));
+JSON.parse(fs.readFileSync(path.join(__dirname,'../hardware/kicad/Placa.kicad_pro'),'utf8'));
+assert(fs.readFileSync(path.join(__dirname,'../hardware/kicad/Placa.kicad_sch'),'utf8').includes('38pin_ESP32-DEVKITC'));
+
+const scripts=s=>[...s.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(x=>x[1]);
+const ids=s=>[...s.split('<script>')[0].matchAll(/\bid="([^"]+)"/g)].map(x=>x[1]);
+assert.strictEqual(new Set(ids(html)).size,ids(html).length);
+assert(!html.split('<script>')[0].includes('data-go='));
+const nodes=new Map();const el=id=>{if(!nodes.has(id))nodes.set(id,{id,hidden:true,appendChild(child){this.child=child;},focus(){},setAttribute(){},removeAttribute(){},textContent:'',innerHTML:'',value:'',style:{},dataset:{},classList:{add(){},remove(){},toggle(){}},addEventListener(){},querySelectorAll(){return []},click(){}});return nodes.get(id)};
+const ctx={console,TextEncoder,TextDecoderStream,setTimeout:()=>0,clearTimeout(){},setInterval(){},navigator:{},localStorage:{getItem(){return null},setItem(){}},document:{getElementById:el,addEventListener(){},querySelector:()=>el('view-gestures'),querySelectorAll:()=>[],createElement:()=>el('download')},window:{addEventListener(){}},confirm:()=>true,alert(){},Blob,URL,Date};
+vm.createContext(ctx);scripts(html).forEach(s=>vm.runInContext(s,ctx));
+vm.runInContext(`if(GESTURES.length!==7)throw Error('Cantidad de gestos');for(const [id,target] of [['FINGER_GUN',[0,0,100,100,100]],['MIDDLE_FINGER',[100,100,0,100,100]]]){seleccionarGesto(id);if(JSON.stringify(selectedGesture.target)!==JSON.stringify(target))throw Error(id);}if(GESTURES.some(g=>g.id==='HEART'))throw Error('Corazón ejecutable');`,ctx);
+(async()=>{
+await vm.runInContext(`(async()=>{globalThis.sent=[];writer={write:async data=>sent.push(new TextDecoder().decode(data))};connected=true;await sendCommand('STATUS','GET');await sendCommand('SERVO','ON');await sendCommand('MODE','GESTURE_DEMO');await sendCommand('POSE','OPEN','0,0,0,0,0');await sendCommand('CAL','RESET');await sendCommand('STOP');})()`,Object.assign(ctx,{TextDecoder}));
+assert.deepStrictEqual(Array.from(ctx.sent),['CMD|001|STATUS|GET\n','CMD|002|SERVO|ON\n','CMD|003|MODE|GESTURE_DEMO\n','CMD|004|POSE|OPEN|0,0,0,0,0\n','CMD|005|CAL|RESET\n','CMD|006|STOP\n']);
+vm.runInContext(`iniciarSesion();for(let i=0;i<12;i++)recibirTramaCompleta(i%2?[100,100,100,100,100]:[0,0,0,0,0]);if(sessionSamples.length!==12||repetitions!==6)throw Error('Sesión');$('sessionCode').value='PRUEBA';if(!obtenerMetricasSesion())throw Error('Métricas');globalThis.csv=[];downloadFile=(n,t)=>csv.push({n,t});exportSessionCsv();saveSession();exportHistoryCsv();if(csv.length!==2||!csv[0].t.includes('tiempo_s'))throw Error('CSV');routineActive=true;routineIndex=0;routineCompleted=false;routineStableSince=null;evaluateRoutine(ROUTINES[0].target,10000);for(let t=10250;t<=11500;t+=250)evaluateRoutine(ROUTINES[0].target,t);if(!routineCompleted)throw Error('Rutina');selectedGesture=GESTURES[0];practiceActive=true;practiceCompleted=false;practiceStableSince=null;evaluatePractice(selectedGesture.target,10000);evaluatePractice(selectedGesture.target,12000);if(!practiceCompleted)throw Error('Gesto');`,ctx);
+await vm.runInContext(`(async()=>{for(const id of ['FINGER_GUN','MIDDLE_FINGER']){seleccionarGesto(id);await demostrarGesto();await finalizarGesto();await practicarGesto();await finalizarGesto();}})()`,ctx);
+assert(ctx.sent.some(s=>s.includes('|POSE|FINGER_GUN|0,0,100,100,100\n')));assert(ctx.sent.some(s=>s.includes('|POSE|MIDDLE_FINGER|100,100,0,100,100\n')));
+
+await vm.runInContext(`(async()=>{
+ routineActive=false;routineStarting=false;practiceActive=false;gestureActivity=null;gestureBusy=false;connected=true;
+ seleccionarGesto('OPEN');if($('gestureWindow').hidden)throw Error('No abrió ventana');
+ minimizeGestureWindow();if(!$('gestureWindow').hidden||$('gestureMiniBar').hidden)throw Error('No minimizó');
+ openGestureWindow();if($('gestureWindow').hidden||!$('gestureMiniBar').hidden)throw Error('No restauró');
+ closeGestureWindow();if(selectedGesture!==null||!$('gestureMiniBar').hidden)throw Error('Cierre inactivo incorrecto');
+ seleccionarGesto('OPEN');
+ await demostrarGesto();closeGestureWindow();if(!gestureActivity||$('gestureMiniBar').hidden)throw Error('Cierre canceló actividad o perdió acceso');
+ minimizeGestureWindow();if(showView('home')!==false)throw Error('Permitió salir durante demo');if($('gestureWindow').hidden)throw Error('No restauró al bloquear salida');
+ seleccionarGesto('FIST');if(selectedGesture.id!=='OPEN')throw Error('Cambió gesto en curso');
+ procesarLinea('EVT|POSE|DONE|OPEN');if(showView('home')!==false)throw Error('Salida sin Finalizar tras demo');
+ await finalizarGesto();if(activityNeedsFinish())throw Error('Bloqueo tras finalizar');
+ if(!sent.some(s=>s.trim().endsWith('|STOP')))throw Error('No envió STOP');
+ await practicarGesto();practiceCompleted=true;practiceActive=false;
+ if(showView('tracking')!==false)throw Error('Salida sin Finalizar tras práctica');
+ const savedSend=sendCommand;sendCommand=async()=>{throw Error('fallo simulado')};await finalizarGesto();
+ if(!gestureActivity)throw Error('Desbloqueó tras fallo de envío');sendCommand=savedSend;await finalizarGesto();
+ routineActive=true;if(showView('control')!==false)throw Error('Permitió salir de rutina');
+ await cancelarRutina();if(showView('home')!==true)throw Error('Bloqueo tras finalizar rutina');
+ routineStarting=true;if(showView('home')!==false)throw Error('Salida al iniciar rutina');routineStarting=false;
+ gestureBusy=true;if(showView('home')!==false)throw Error('Salida durante envío');gestureBusy=false;
+ setConnectionUI(false);if(activityNeedsFinish())throw Error('Bloqueo sin conexión');
+})()`,ctx);
+console.log('PASS flujo: ventana flotante, minimizar, restaurar, cerrar sin perder actividad, demo/manual, bloqueo de sección y selección, Finalizar/STOP, error de envío, rutina y desconexión.');
+console.log('PASS: IDs; navegación; arranque; protocolo serial; sesiones y CSV; rutina y práctica simuladas; órdenes de ambos gestos nuevos.');
+})().catch(e=>{console.error(e);process.exitCode=1});
