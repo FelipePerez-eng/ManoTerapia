@@ -157,6 +157,7 @@ let sessionActive = false, sessionStartedAt = 0, sessionSamples = [], repetition
 let sessionExercises = 0, sessionPractices = 0, sessionDemos = 0;
 let routineLastFrameAt = null;
 let routineActive = false, routineIndex = 0, routineCompleted = false, routineStableSince = null;
+let routineStartWaiter = null, routineHardwareReady = false, routineSuspended = false;
 let gestureActivity = null, gestureBusy = false, routineStarting = false;
 let selectedGesture = null, practiceActive = false, practiceStableSince = null, practiceCompleted = false;
 let toastTimer = null;
@@ -234,13 +235,19 @@ function setConnectionUI(isConnected) {
   $('btnCalReset').disabled = !isConnected;
   $('btnManualMode').disabled = !isConnected;
   $('btnStop').disabled = !isConnected;
-  $('btnRoutineStart').disabled = !isConnected || routineActive;
+  $('btnRoutineStart').disabled = !isConnected || routineStarting || (routineActive && !routineSuspended);
   $('btnGestureDemo').disabled = !isConnected || !selectedGesture;
   $('btnGesturePractice').disabled = !isConnected || !selectedGesture;
   $('homeDot').className = `dot ${isConnected ? 'green' : 'red'}`;
   $('homeStatus').textContent = isConnected ? 'ESP32 conectado y transmitiendo' : 'Esperando conexión con el ESP32';
   updateGestureControls();
   if (!isConnected) {
+    routineHardwareReady = false; routineSuspended = false;
+    if (routineStartWaiter) {
+      const waiter = routineStartWaiter; routineStartWaiter = null;
+      clearTimeout(waiter.timer); waiter.reject(new Error('Se perdió la conexión con el ESP32.'));
+    }
+    $('btnRoutineStart').textContent = 'Iniciar rutina';
     servoOn = false;
     routineActive = false; practiceActive = false;
     gestureActivity = null; gestureBusy = false; routineStarting = false;
@@ -378,18 +385,18 @@ function procesarLinea(linea) {
     return;
   }
   if (l.startsWith('Servos:')) {
-    servoOn = l.toUpperCase().includes('ACTIVOS'); updateServoUI(); return;
+    servoOn = l.toUpperCase().includes('ACTIVOS'); updateServoUI(); observeRoutineHardware(servoOn); return;
   }
   if (l.startsWith('STATE|SERVO|')) {
     const parts = l.split('|');
     servoOn = parts[2] === 'ON'; currentMode = parts[4] || currentMode;
-    updateServoUI(); updateModeUI(); return;
+    updateServoUI(); updateModeUI(); observeRoutineHardware(servoOn,currentMode,true); return;
   }
   if (l.startsWith('EVT|SERVO|')) {
-    servoOn = l.endsWith('|ON'); updateServoUI(); return;
+    servoOn = l.endsWith('|ON'); updateServoUI(); observeRoutineHardware(servoOn); return;
   }
   if (l.startsWith('EVT|MODE|')) {
-    currentMode = l.split('|')[2] || currentMode; updateModeUI(); return;
+    currentMode = l.split('|')[2] || currentMode; updateModeUI(); observeRoutineHardware(servoOn,currentMode); return;
   }
   if (l.startsWith('EVT|POSE|DONE|')) {
     sessionDemos++;
@@ -449,25 +456,98 @@ function renderRoutineTargets() {
   $('routineProgress').style.width = `${(routineIndex/ROUTINES.length)*100}%`;
   renderRoutineSteps();
 }
+
+function observeRoutineHardware(isOn, mode = currentMode, completeStatus = false) {
+  if (routineStartWaiter && completeStatus && isOn && mode === 'ROUTINE') {
+    const waiter = routineStartWaiter;
+    routineStartWaiter = null;
+    clearTimeout(waiter.timer);
+    waiter.resolve();
+  }
+  if (routineActive && (!isOn || mode !== 'ROUTINE') && !routineSuspended) {
+    routineHardwareReady = false; routineSuspended = true;
+    routineStableSince = null; routineLastFrameAt = null;
+    $('routineState').textContent = 'Rutina en pausa';
+    $('routineFeedback').textContent = 'Los servos deben estar activos en modo rutina. Pulsa Reanudar rutina para continuar, o Finalizar rutina para salir.';
+    $('btnRoutineStart').textContent = 'Reanudar rutina';
+    $('btnRoutineStart').disabled = !connected || routineStarting;
+    $('btnRoutineNext').disabled = true;
+    showToast('Rutina en pausa: se interrumpió el control de los servos.');
+  }
+}
+function waitForRoutineHardware() {
+  let resolve, reject;
+  const promise = new Promise((yes,no)=>{resolve=yes;reject=no;});
+  // La escritura también puede fallar antes de que se llegue a await promise.
+  promise.catch(()=>{});
+  const waiter = {resolve,reject,timer:null};
+  waiter.timer = setTimeout(()=>{
+    if (routineStartWaiter !== waiter) return;
+    routineStartWaiter = null;
+    reject(new Error('El ESP32 no confirmó servos activos en modo rutina.'));
+  },3500);
+  routineStartWaiter = waiter;
+  return {promise,waiter};
+}
+
 async function iniciarRutina() {
   if (!connected) { showToast('Conecta el ESP32 antes de iniciar una rutina.'); return; }
-  if (activityNeedsFinish()) { showToast('Finaliza la actividad actual.'); return; }
-  routineStarting = true;
+  const resuming = routineActive && routineSuspended;
+  if (routineStarting || (!resuming && activityNeedsFinish())) {
+    showToast('Finaliza la actividad actual.'); return;
+  }
+  routineStarting = true; routineHardwareReady = false;
+  $('btnRoutineStart').disabled = true;
+  $('routineState').textContent = 'Confirmando activación de servos…';
+  const pending = waitForRoutineHardware();
   try {
-    await ensureServosOn();
+    await sendCommand('SERVO','ON');
     await sendCommand('MODE','ROUTINE');
-    if (!connected) return;
-    routineActive = true; routineIndex = 0; routineCompleted = false; routineStableSince = null;
-    $('routineState').textContent = 'Rutina en curso';
-    $('btnRoutineStart').disabled = true; $('btnRoutineNext').disabled = true; $('btnRoutineCancel').disabled = false;
-    $('routineSuccess').classList.add('hidden');
-    $('routineFeedback').textContent = 'Realiza el movimiento indicado. El objetivo debe mantenerse estable durante al menos 1,2 segundos.';
+    await sendCommand('STATUS','GET');
+    await pending.promise;
+    if (!connected || !servoOn || currentMode !== 'ROUTINE') {
+      throw new Error('El estado de los servos cambió durante el inicio.');
+    }
+    routineHardwareReady = true; routineSuspended = false;
+    if (!resuming) {
+      routineIndex = 0; routineCompleted = false;
+    }
+    routineActive = true; routineStableSince = null; routineLastFrameAt = null;
+    $('routineState').textContent = routineCompleted ? 'Ejercicio completado' : 'Rutina en curso';
+    $('btnRoutineNext').disabled = !routineCompleted;
+    $('btnRoutineCancel').disabled = false;
+    $('routineSuccess').classList.toggle('hidden',!routineCompleted);
+    $('routineFeedback').textContent = routineCompleted
+      ? 'Objetivo ya completado. Puedes continuar al siguiente ejercicio.'
+      : 'Servos activos confirmados. Mantén los cinco dedos dentro del margen durante 1,2 segundos.';
     renderRoutineTargets();
-    showToast('Rutina iniciada. El modo de control sigue la mano maestra.');
-  } catch (_) {} finally { routineStarting = false; }
+    showToast(resuming ? 'Rutina reanudada con servos activos.' : 'Rutina iniciada con servos activos.');
+  } catch (error) {
+    routineHardwareReady = false; routineStableSince = null;
+    if (connected) { try { await sendCommand('STOP'); } catch (_) {} }
+    routineSuspended = Boolean(resuming && connected);
+    if (!routineSuspended) routineActive = false;
+    $('routineState').textContent = routineSuspended ? 'Rutina en pausa' : 'Rutina sin iniciar';
+    $('routineFeedback').textContent = error.message || 'No se pudo activar la rutina.';
+    showToast(error.message || 'No se pudo activar la rutina.');
+  } finally {
+    if (routineStartWaiter === pending.waiter) {
+      routineStartWaiter = null;
+      clearTimeout(pending.waiter.timer);
+      pending.waiter.reject(new Error('Inicio de rutina finalizado.'));
+    }
+    routineStarting = false;
+    $('btnRoutineStart').textContent = routineSuspended ? 'Reanudar rutina' : 'Iniciar rutina';
+    $('btnRoutineStart').disabled = !connected || (routineActive && !routineSuspended);
+    $('btnRoutineCancel').disabled = !routineActive;
+  }
 }
 function evaluateRoutine(frame,now) {
   if (!routineActive || routineCompleted) return;
+  if (!connected || !servoOn || !routineHardwareReady || routineSuspended || currentMode !== 'ROUTINE') {
+    routineStableSince = null; routineLastFrameAt = null;
+    return;
+  }
   const step = ROUTINES[routineIndex];
   const target = step.target;
   const tolerance = step.tolerance ?? ROUTINE_TOLERANCE;
@@ -505,7 +585,7 @@ function evaluateRoutine(frame,now) {
   }
 }
 function siguienteEjercicio() {
-  if (!routineActive || !routineCompleted) return;
+  if (!routineActive || !routineCompleted || routineSuspended || !routineHardwareReady || !servoOn || !connected) return;
   if (routineIndex >= ROUTINES.length-1) {
     finalizarRutina(); return;
   }
@@ -516,6 +596,8 @@ function siguienteEjercicio() {
   renderRoutineTargets();
 }
 async function finalizarRutina() {
+  routineHardwareReady = false; routineSuspended = false;
+  $('btnRoutineStart').textContent = 'Iniciar rutina';
   routineActive = false; routineStableSince = null;
   $('routineState').textContent = 'Rutina finalizada';
   $('btnRoutineStart').disabled = false; $('btnRoutineNext').disabled = true; $('btnRoutineCancel').disabled = true;
@@ -526,6 +608,8 @@ async function finalizarRutina() {
   showToast('Rutina finalizada.');
 }
 async function cancelarRutina() {
+  routineHardwareReady = false; routineSuspended = false;
+  $('btnRoutineStart').textContent = 'Iniciar rutina';
   routineActive = false; routineCompleted = false; routineStableSince = null;
   $('routineState').textContent = 'Rutina cancelada';
   $('btnRoutineStart').disabled = false; $('btnRoutineNext').disabled = true; $('btnRoutineCancel').disabled = true;

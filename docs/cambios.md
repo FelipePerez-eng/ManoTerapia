@@ -1,5 +1,13 @@
 # Cambios principales
 
+## 8 de noviembre de 2026 · rutina con servos confirmados
+
+- Conservar el esquema editado localmente por el usuario, sin sobrescribirlo con la copia remota anterior; la PCB y el firmware siguen sin cambios en esta entrega.
+- Iniciar o reanudar rutina mediante SERVO ON, MODE ROUTINE y STATUS GET. Solo entrar en curso tras recibir el estado ON/ROUTINE del ESP32.
+- Pausar al recibir apagado o salida de modo; no aceptar objetivos ni avanzar en pausa. Reanudar explícitamente conserva el paso y reinicia la retención temporal.
+- Si no se confirma el estado en 3,5 segundos o falla el inicio, intentar enviar STOP y mostrar el error. No asumir éxito físico de una orden enviada.
+- Añadir pruebas simuladas de confirmación, pausa, reanudación, timeout, desconexión y escritura fallida. No cambia el .ino ni reactiva automáticamente los servos después de una pausa.
+
 ## 8 de noviembre de 2026 · activación según mano maestra
 
 - Calcular cinco objetivos a partir de lecturas nuevas de los potenciómetros antes de habilitar PWM. Evita imponer siempre 0° al activar.

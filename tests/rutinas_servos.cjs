@@ -1,0 +1,43 @@
+const fs=require('fs'),path=require('path'),vm=require('vm'),assert=require('assert');
+module.exports=async function(){
+ const html=fs.readFileSync(path.join(__dirname,'../dashboard/ManoTerapia.html'),'utf8');
+ const nodes=new Map();const el=id=>{if(!nodes.has(id))nodes.set(id,{id,hidden:true,disabled:false,textContent:'',innerHTML:'',value:'',style:{},dataset:{},focus(){},setAttribute(){},removeAttribute(){},classList:{add(){},remove(){},toggle(){},contains(){return false}},addEventListener(){},querySelectorAll(){return []}});return nodes.get(id)};
+ let n=0,response='confirm',failWrite=false;const timers=new Map(),sent=[];
+ const ctx={console,TextEncoder,TextDecoder,TextDecoderStream,Blob,URL,Date,clearTimeout:id=>timers.delete(id),setTimeout:(fn,ms)=>{const id=++n;timers.set(id,{fn,ms});return id},setInterval(){},navigator:{},localStorage:{getItem(){return null},setItem(){}},confirm:()=>true,alert(){},document:{getElementById:el,addEventListener(){},querySelector:()=>null,querySelectorAll:()=>[],createElement:()=>el('download')},window:{addEventListener(){}}};
+ vm.createContext(ctx);for(const m of html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g))vm.runInContext(m[1],ctx);
+ ctx.testWriter={write:async bytes=>{
+   if(failWrite)throw Error('Escritura simulada fallida');
+   const line=new TextDecoder().decode(bytes);sent.push(line);const fields=line.trim().split('|');
+   if(fields[2]==='SERVO')ctx.procesarLinea('EVT|SERVO|ON');
+   if(fields[2]==='MODE')ctx.procesarLinea('EVT|MODE|'+fields[3]);
+   if(fields[2]==='STATUS'&&response==='confirm')ctx.procesarLinea('STATE|SERVO|ON|MODE|ROUTINE');
+   if(fields[2]==='STOP'){ctx.procesarLinea('EVT|SERVO|OFF');ctx.procesarLinea('EVT|MODE|MANUAL');}
+ }};
+ const run=s=>vm.runInContext(s,ctx);
+ run('writer=testWriter;connected=true;writeQueue=Promise.resolve();');
+ response='none';const waiting=run('iniciarRutina()');
+ for(let i=0;i<16;i++)await Promise.resolve();
+ assert(!run('routineActive'));assert(run('routineStarting'));
+ run("procesarLinea('Servos: ACTIVOS');evaluateRoutine([0,0,0,0,0],1000);evaluateRoutine([0,0,0,0,0],3000);");
+ assert(!run('routineHardwareReady'));assert.strictEqual(run('sessionExercises'),0);
+ ctx.procesarLinea('STATE|SERVO|OFF|MODE|ROUTINE');
+ const timeout=[...timers.values()].find(t=>t.ms===3500);assert(timeout);timeout.fn();await waiting;
+ assert(!run('routineActive'));assert(sent.some(s=>s.trim().endsWith('|STOP')));
+ response='confirm';sent.length=0;await run('iniciarRutina()');
+ assert(run('routineActive && routineHardwareReady && servoOn && currentMode === "ROUTINE"'));
+ assert.deepStrictEqual(sent.slice(0,3).map(s=>s.trim().split('|').slice(2).join('|')),['SERVO|ON','MODE|ROUTINE','STATUS|GET']);
+ run('for(let t=10000;t<=11250;t+=250)evaluateRoutine([0,0,0,0,0],t)');assert(run('routineCompleted'));
+ run('routineCompleted=false;routineIndex=2;routineStableSince=null;routineLastFrameAt=null;evaluateRoutine([50,50,50,50,50],12000)');
+ const count=run('sessionExercises');ctx.procesarLinea('EVT|SERVO|OFF');
+ assert(run('routineSuspended'));assert.strictEqual(el('btnRoutineStart').textContent,'Reanudar rutina');
+ run('for(let t=12250;t<=14000;t+=250)evaluateRoutine([50,50,50,50,50],t)');assert.strictEqual(run('sessionExercises'),count);
+ run('routineCompleted=true;siguienteEjercicio();');assert.strictEqual(run('routineIndex'),2);
+ ctx.procesarLinea('EVT|SERVO|ON');assert(run('routineSuspended'));assert(!run('routineHardwareReady'));
+ run('routineCompleted=false;');await run('iniciarRutina()');assert.strictEqual(run('routineIndex'),2);assert(!run('routineSuspended'));
+ run('for(let t=15000;t<=16250;t+=250)evaluateRoutine([50,50,50,50,50],t)');assert(run('routineCompleted'));
+ ctx.procesarLinea('EVT|MODE|MANUAL');assert(run('routineSuspended'));
+ await run('cancelarRutina()');assert(!run('routineActive'));
+ response='none';const disconnected=run('iniciarRutina()');for(let i=0;i<16;i++)await Promise.resolve();run('setConnectionUI(false)');await disconnected;assert(!run('routineActive'));assert(!run('routineStarting'));
+ run('connected=true;writer=testWriter;writeQueue=Promise.resolve();');failWrite=true;await run('iniciarRutina()');assert(!run('routineActive'));assert(!run('routineStartWaiter'));
+ console.log('PASS rutina: exige confirmación ON/ROUTINE, espera y timeout, pausa por OFF/cambio de modo, no evalúa apagada, reanuda el mismo paso y maneja desconexión/fallo de envío.');
+};

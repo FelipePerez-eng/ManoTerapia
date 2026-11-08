@@ -57,7 +57,7 @@ El HTML incorpora estilos, JavaScript y banner METIE; no necesita bibliotecas we
 
 - **Control espejo:** la mano robótica sigue las lecturas de la mano maestra, con filtrado adaptativo, órdenes graduales e histéresis angular para reducir movimientos pequeños no deseados.
 - **Activación:** antes de habilitar los servos, lee los cinco potenciómetros y calcula sus objetivos con la calibración vigente. Ya no impone siempre la posición abierta al activarlos. Esto no conoce la postura física previa ni garantiza eliminar el pico de corriente.
-- **Rutinas:** muestran el objetivo y la lectura de cada dedo. La flexión intermedia admite de 30 % a 70 %; los demás pasos mantienen su margen de ±15 puntos. La posición se mantiene durante 1,2 segundos con recepción continua de datos.
+- **Rutinas:** activan los servos y esperan que el ESP32 confirme `SERVO ON` y modo `ROUTINE` antes de empezar. Si se apagan los servos o cambia el modo, la rutina queda en pausa y no valida ejercicios; **Reanudar rutina** vuelve a solicitar activación y conserva el paso. Muestran el objetivo y la lectura de cada dedo. La flexión intermedia admite de 30 % a 70 %; los demás pasos mantienen su margen de ±15 puntos. La posición se mantiene durante 1,2 segundos con recepción continua de datos.
 - **Gestos:** mano abierta, puño, pulgar arriba, paz, señalamiento, pistolita y dedo medio. Una ventana flotante ofrece **Automático**, **Manual** y **Finalizar**, con opciones de minimizar y cerrar sin desplazar las tarjetas. Ocultar la ventana no finaliza una actividad.
 - **Seguimiento:** sesiones locales, ciclos, muestras, actividades e informes CSV.
 
