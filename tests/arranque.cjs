@@ -1,0 +1,10 @@
+const fs=require('fs'),path=require('path'),vm=require('vm'),assert=require('assert');
+const fw=fs.readFileSync(path.join(__dirname,'../firmware/ManoTerapia_ESP32/ManoTerapia_ESP32.ino'),'utf8');
+const extract=name=>{const a=fw.indexOf('void '+name+'() {');return fw.slice(a,fw.indexOf('\n}',a)+2)};
+const js=extract('activarServos').replace('void activarServos()','function activarServos()').replace(/\bint raw\b/g,'let raw').replace(/\bfloat /g,'let ').replace(/for \(int i/g,'for (let i').replace(/(\d+(?:\.\d+)?)f\b/g,'$1');
+const open=[4095,4095,4095,4095,4095],closed=[3800,2700,2500,2800,3100],pins=[33,32,35,34,36],servoPins=[23,22,21,19,18];
+for(const [label,raws,expected] of [['abierta',open,0],['cerrada',closed,180],['intermedia',open.map((v,i)=>Math.round((v+closed[i])/2)),90]]){
+const events=[];const ctx={NUM:5,servosActivos:false,poseEnMovimiento:true,PIN_LED:13,HIGH:1,PINES_POT:pins,PINES_SERVO:servoPins,filtrado:[0,0,0,0,0],potAbierto:open,potCerrado:closed,anguloActual:[0,0,0,0,0],anguloObjetivo:[0,0,0,0,0],leerPot:p=>{events.push('read');return raws[pins.indexOf(p)]},constrain:(v,a,b)=>Math.max(a,Math.min(b,v)),anguloDesdePorcentaje:(i,p)=>Math.round(p*1.8),digitalWrite(){},Serial:{println(){}},servos:servoPins.map((p,i)=>({setPeriodHertz(){},attach(pin){assert.strictEqual(pin,p);events.push('attach')},write(angle){assert(Math.abs(angle-expected)<=1,label);events.push('write')}}))};
+vm.createContext(ctx);vm.runInContext(js,ctx);vm.runInContext('activarServos()',ctx);assert.deepStrictEqual(events.slice(0,5),['read','read','read','read','read']);assert.strictEqual(events.filter(x=>x==='write').length,5);assert.deepStrictEqual(ctx.filtrado,raws);assert(ctx.servosActivos);assert(!ctx.poseEnMovimiento);const n=events.length;vm.runInContext('activarServos()',ctx);assert.strictEqual(events.length,n);
+}
+console.log('PASS arranque: lectura nueva antes de attach, cinco objetivos calibrados, extremos/intermedia e idempotencia. Simulación de lógica; no comprueba pulsos de attach ni corriente física.');

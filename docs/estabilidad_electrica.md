@@ -4,7 +4,17 @@
 
 El usuario informa pequeños saltos incluso sin tocar el montaje. Antes describió cambios de lectura al mover cables y mejoría tras resoldar. Usa cinco MG90S con fuente externa de 5 V; no se conoce su capacidad en amperios. No hay medición de tensión bajo carga ni captura de señal PWM.
 
-La fuente de los saltos no está confirmada. No aumentar filtros o tolerancias indefinidamente para ocultarlos. La copia organizada conserva el programa actual.
+La fuente de los saltos no está confirmada. No aumentar filtros o tolerancias indefinidamente para ocultarlos. Tras la organización se actualiza la activación para tomar los objetivos de lecturas nuevas de la mano maestra, en vez de imponer siempre 0°. Todavía puede existir movimiento al activar, porque el programa no mide dónde está cada servo físicamente; la modificación no constituye una garantía de reducción de corriente.
+
+## Observaciones de la revisión aportada por el usuario
+
+- Antes, activarServos conectaba los cinco servos y ordenaba la posición abierta. La modificación calcula anguloActual y anguloObjetivo de los cinco antes del primer attach y aplica cada objetivo inmediatamente después de attach. No se ha medido el pulso transitorio de la biblioteca al conectar PWM ni se escalona la activación.
+- El dato de 0,7 A por MG90S en bloqueo no está verificado para estas unidades. Si se usa como hipótesis, cinco sumarían 3,5 A, sin contar el ESP32 ni margen: una fuente de 3 A no cubriría ese escenario. La ficha del fabricante consultada no publica esa corriente; confirmar fuente y consumos reales.
+- 470–1000 µF cerca de la alimentación de servos es una propuesta de desacoplo por validar, no sustituto de una fuente adecuada. Revisar polaridad, tensión nominal, cableado y comportamiento bajo carga antes de aplicarla.
+- No se modifican los límites a 10–170° automáticamente: los ángulos seguros deben medirse por dedo con la mecánica real. Mantener 0–180° en el código no demuestra que el montaje tolere todo ese recorrido.
+- El ancho de pista de 1,5 mm señalado en la revisión no descarta caídas de tensión o interferencias del retorno compartido. También importan longitud, espesor de cobre, conexiones y corriente. No se ha validado el recorrido de retorno con mediciones.
+- El tramo de 295 cuentas del pulgar equivale aproximadamente a 0,61 grados por cuenta para un mapeo nominal de 180°. No se cambia su calibración ni se añade filtrado exclusivo sin una medición de ruido en reposo.
+- Espressif publica para ESP32 un rango de medida aproximado de 150–3100 mV con atenuación de 11 dB. Un código 4095 señala el techo de la conversión, pero no confirma por sí solo una tensión exacta ni una pérdida de contacto del cursor.
 
 ## Separar seguimiento y comportamiento del servo
 
@@ -27,3 +37,5 @@ El esquema aportado no muestra condensadores externos de filtrado en las cinco e
 - [Espressif: ADC y reducción de ruido](https://docs.espressif.com/projects/esp-idf/en/v4.4.8/esp32/api-reference/peripherals/adc.html).
 - [Pololu: interfaz de control y efecto de variaciones del pulso](https://www.pololu.com/blog/17/servo-control-interface-in-detail).
 - [Arduino: diagnóstico de servos y alimentación](https://support.arduino.cc/hc/en-us/articles/360017053760-Troubleshoot-servo-motors).
+- [Espressif: rangos ADC por atenuación](https://docs.espressif.com/projects/arduino-esp32/en/latest/api/adc.html).
+- [Ficha del fabricante MG90S consultada](https://torqpro.com/product/mg90s/).

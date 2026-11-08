@@ -1,4 +1,5 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert'),path=require('path');
+require('./arranque.cjs');
 const html=fs.readFileSync(path.join(__dirname,'../dashboard/ManoTerapia.html'),'utf8');
 const firmware=fs.readFileSync(path.join(__dirname,'../firmware/ManoTerapia_ESP32/ManoTerapia_ESP32.ino'),'utf8');
 const values=name=>firmware.match(new RegExp(name+'\\[NUM\\]\\s*=\\s*\\{([^}]+)\\}'))[1].split(',').map(Number);

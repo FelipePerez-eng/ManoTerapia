@@ -56,6 +56,7 @@ El HTML incorpora estilos, JavaScript y banner METIE; no necesita bibliotecas we
 ## Funciones actuales
 
 - **Control espejo:** la mano robótica sigue las lecturas de la mano maestra, con filtrado adaptativo, órdenes graduales e histéresis angular para reducir movimientos pequeños no deseados.
+- **Activación:** antes de habilitar los servos, lee los cinco potenciómetros y calcula sus objetivos con la calibración vigente. Ya no impone siempre la posición abierta al activarlos. Esto no conoce la postura física previa ni garantiza eliminar el pico de corriente.
 - **Rutinas:** muestran el objetivo y la lectura de cada dedo. La flexión intermedia admite de 30 % a 70 %; los demás pasos mantienen su margen de ±15 puntos. La posición se mantiene durante 1,2 segundos con recepción continua de datos.
 - **Gestos:** mano abierta, puño, pulgar arriba, paz, señalamiento, pistolita y dedo medio. Una ventana flotante ofrece **Automático**, **Manual** y **Finalizar**, con opciones de minimizar y cerrar sin desplazar las tarjetas. Ocultar la ventana no finaliza una actividad.
 - **Seguimiento:** sesiones locales, ciclos, muestras, actividades e informes CSV.
@@ -87,8 +88,6 @@ La lectura disminuye al cerrar la mano. La calibración utiliza esos extremos si
 Los archivos proceden del proyecto `Placa` de METIE, creado con **KiCad 10**. Abre `Placa.kicad_pro` para trabajar con esquema y PCB. Se incluyen el símbolo ESP32 y sus huellas locales. En esta copia se normalizó la tabla de huellas para evitar entradas duplicadas y se añadió una tabla de símbolos con ruta relativa.
 
 El esquema y la PCB no se rediseñaron durante la organización. Los modelos 3D externos no se incluyen; las huellas pueden conservar referencias a `KICAD_USER_3DMODEL_DIR`. No publicar archivos de fabricación como validados hasta revisar el diseño y su correspondencia con el montaje.
-
-<img width="635" height="325" alt="Esquematico" src="https://github.com/user-attachments/assets/725c1a6b-389b-4fb6-9d05-4f8647cee697" />
 
 ## Estado y límites
 

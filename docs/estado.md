@@ -3,12 +3,12 @@
 ## Archivos vigentes
 
 - Dashboard: última variante con ventana flotante, minimizar/cerrar, finalización explícita y rutinas ajustadas, renombrada sin cambiar su contenido.
-- Firmware: última variante entregada `estable`, renombrada sin cambiar su contenido. Conserva pines corregidos, calibración vigente, filtrado adaptativo, pasos de 4 grados e histéresis de 2 grados en el seguimiento, además del antirrebote de 60 ms.
+- Firmware: base `estable`, con activación actualizada para leer los cinco potenciómetros y calcular sus objetivos antes de habilitar PWM. Conserva pines corregidos, calibración vigente, filtrado adaptativo, pasos de 4 grados e histéresis de 2 grados en el seguimiento, además del antirrebote de 60 ms.
 - KiCad: esquema y PCB del proyecto Placa confirmados por el usuario; los originales de Escritorio no se modifican. Símbolo y huellas incluidos. Solo se normalizan tablas locales de bibliotecas en la copia organizada.
 
 ## Qué se comprobó
 
-Los archivos operativos y respaldos locales se movieron conservando sus hashes SHA-256. Las pruebas funcionales se consolidan en tests/verificar.cjs para no depender de rutas de Descargas o de variantes antiguas.
+Los archivos operativos y respaldos locales se movieron conservando sus hashes SHA-256 al organizarlos. La modificación posterior de activación está registrada en Git; su base también queda respaldada en work/. Las pruebas funcionales se consolidan en tests/verificar.cjs para no depender de rutas de Descargas o de variantes antiguas. Incluyen tests/arranque.cjs: lectura nueva antes de attach, objetivos abiertos/cerrados/intermedios e idempotencia simulados.
 
 En la conversación se ejecutaron pruebas simuladas de calibración, filtrado, antirrebote, límites de avance, histéresis, protocolo, rutinas, navegación, gestos, ventana flotante, sesiones y CSV. No hay una compilación Arduino/ESP32 ni una inspección visual final en navegador registradas para la última combinación de archivos.
 

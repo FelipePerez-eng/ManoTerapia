@@ -133,11 +133,22 @@ void reiniciarMinMax() {
 void activarServos() {
   if (servosActivos) return;
 
+  // Leer los cinco potenciometros antes de habilitar cualquier PWM.
+  // Esto no mide la posicion fisica de los servos.
+  for (int i = 0; i < NUM; i++) {
+    int raw = leerPot(PINES_POT[i]);
+    filtrado[i] = raw; // Evitar retomar una lectura filtrada anterior.
+    float denominador = potCerrado[i] - potAbierto[i];
+    float t = (denominador == 0.0f) ? 0.0f :
+              (filtrado[i] - potAbierto[i]) / denominador;
+    t = constrain(t, 0.0f, 1.0f);
+    anguloActual[i] = anguloDesdePorcentaje(i, t * 100.0f);
+    anguloObjetivo[i] = anguloActual[i];
+  }
+
   for (int i = 0; i < NUM; i++) {
     servos[i].setPeriodHertz(50);
     servos[i].attach(PINES_SERVO[i], 500, 2400);
-    anguloActual[i] = (int)servoAbierto[i];
-    anguloObjetivo[i] = anguloActual[i];
     servos[i].write(anguloActual[i]);
   }
 

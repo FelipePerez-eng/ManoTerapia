@@ -1,5 +1,12 @@
 # Cambios principales
 
+## 8 de noviembre de 2026 · activación según mano maestra
+
+- Calcular cinco objetivos a partir de lecturas nuevas de los potenciómetros antes de habilitar PWM. Evita imponer siempre 0° al activar.
+- Mantener calibración, pines, filtro, antirrebote y límites existentes. No se escalona la alimentación ni se afirma medir la posición real del servo.
+- Añadir pruebas simuladas de activación. Pendiente compilación Arduino/ESP32 y prueba física de corriente y movimiento.
+- ERC sigue anunciando 28 incidencias sin un informe detallado recuperable; ver docs/ERC_estado.md. PCB y límites mecánicos no se modifican.
+
 ## 8 de noviembre de 2026 · organización
 
 - Una sola versión vigente en dashboard/ y firmware/.
