@@ -85,6 +85,10 @@ La lectura disminuye al cerrar la mano. La calibración utiliza esos extremos si
 
 ## KiCad
 
+![Esquemático de ManoTerapia: ESP32, potenciómetros, señales de servos, pulsador y conectores](docs/imagenes/Esquematico.webp)
+
+Esquemático compartido por el equipo. Los conectores flex aparecen en el diseño, pero no se utilizan en el firmware vigente. Para consultar la edición actual, abre el archivo `.kicad_sch` del proyecto.
+
 Los archivos proceden del proyecto `Placa` de METIE, creado con **KiCad 10**. Abre `Placa.kicad_pro` para trabajar con esquema y PCB. Se incluyen el símbolo ESP32 y sus huellas locales. En esta copia se normalizó la tabla de huellas para evitar entradas duplicadas y se añadió una tabla de símbolos con ruta relativa.
 
 El esquema y la PCB no se rediseñaron durante la organización. Los modelos 3D externos no se incluyen; las huellas pueden conservar referencias a `KICAD_USER_3DMODEL_DIR`. No publicar archivos de fabricación como validados hasta revisar el diseño y su correspondencia con el montaje.
@@ -105,4 +109,4 @@ node tests/verificar.cjs
 
 Las pruebas son simuladas y no sustituyen compilar el firmware en Arduino IDE ni probar el prototipo. Consultar [docs/estado.md](docs/estado.md) para distinguir las verificaciones realizadas de las pendientes.
 
-Repositorio privado: [FelipePerez-eng/ManoTerapia](https://github.com/FelipePerez-eng/ManoTerapia). Cada cambio debe quedar descrito en un commit; las versiones antiguas se recuperan desde ese historial. No subir datos personales de participantes, CSV de sesiones ni credenciales.
+Repositorio: [FelipePerez-eng/ManoTerapia](https://github.com/FelipePerez-eng/ManoTerapia). Cada cambio debe quedar descrito en un commit; las versiones antiguas se recuperan desde ese historial. No subir datos personales de participantes, CSV de sesiones ni credenciales.
